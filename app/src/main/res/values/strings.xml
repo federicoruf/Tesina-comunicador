@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">My Application</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_speak">Hablar</string>
+    <string name="microphono">Micrófono</string>
+    <string name="ListaFrases">Lista de frases</string>
+    <string name="title_activity_talk">Talk</string>
+    <string name="title_activity_list_phrases">ListPhrasesActivity</string>
+    <string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>
+    <string name="choose_phrase">Elegir frase</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="buscar_lugar">Buscar lugar</string>
+    <string name="descargar_conversacion">Descargar conversación</string>
+    <string name="activate_gps">Activar GPS</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="button_Download">Desargar conversación</string>
+    <string name="category_phrases">Frases de categoría:</string>
+    <string name="searchResutls">Resultados de la busqueda</string>
+</resources>

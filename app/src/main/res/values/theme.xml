@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--
+    <style name="MyTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/BlueWhiteActionBarTheme</item>
+        <item name="android:background">#FEFEFE</item>
+    </style>
+
+    <style name="BlueWhiteActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#0089CD</item>
+
+    </style>
+-->
+    <!-- the theme applied to the application or activity -->
+    <style name="MyTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/BlueWhiteActionBarTheme</item>
+
+    </style>
+
+
+    <style name="BlueWhiteActionBarTheme" parent="@android:style/Widget.Holo">
+ <!--       <item name="android:background">@drawable/actionbar_background</item>-->
+        <item name="background">@drawable/actionbar_background</item>
+    </style>
+</resources>
