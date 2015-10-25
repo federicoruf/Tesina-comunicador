@@ -12,8 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import objects.Category;
-import objects.ProvisionalContainer;
+import com.example.federico.objects.Category;
+import com.example.federico.objects.ProvisionalContainer;
 
 public class ListPhrasesActivity extends Activity {
 

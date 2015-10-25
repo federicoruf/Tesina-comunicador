@@ -1,4 +1,4 @@
-package objects;
+package com.example.federico.objects;
 
 import android.app.AlertDialog;
 import android.app.Service;

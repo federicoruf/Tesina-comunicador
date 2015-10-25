@@ -1,6 +1,4 @@
-package objects;
-
-import android.location.Location;
+package com.example.federico.objects;
 
 import com.google.api.client.util.Key;
 import java.io.Serializable;
@@ -14,17 +12,11 @@ public class Place implements Serializable {
     @Key
     public String reference;
     @Key
-    public String icon;
-    @Key
     public String vicinity;
     @Key
     public Geometry geometry;
     @Key
     public ArrayList<String> types;
-    @Key
-    public String formatted_address;
-    @Key
-    public String formatted_phone_number;
     @Override
     public String toString() {
         return name + " - " + id + " - " + reference;

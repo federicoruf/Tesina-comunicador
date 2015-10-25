@@ -1,13 +1,6 @@
-package objects;
-
-import android.location.Location;
-import android.support.annotation.NonNull;
+package com.example.federico.objects;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by federico on 06/10/2015.

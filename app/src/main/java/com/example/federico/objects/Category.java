@@ -1,4 +1,4 @@
-package objects;
+package com.example.federico.objects;
 
 import java.util.ArrayList;
 
@@ -7,8 +7,17 @@ import java.util.ArrayList;
  */
 
 public class Category {
+    long id;
     String name;
     String englishName;
+
+    public long getId() {
+        return this.id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getEnglishName() {
         return englishName;

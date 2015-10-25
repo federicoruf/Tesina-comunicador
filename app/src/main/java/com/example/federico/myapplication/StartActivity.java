@@ -2,28 +2,18 @@ package com.example.federico.myapplication;
 
 //import com.google.api.translate.Language;
 //import com.google.api.translate.Translate;
-import com.google.api.GoogleAPI;
-import com.google.api.translate.Language;
-import com.google.api.translate.Translate;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,57 +28,24 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import objects.Category;
-import objects.GetPlaces;
-import objects.Place;
-import objects.PlacesList;
-import android.view.View.OnKeyListener;
+import com.example.federico.objects.Category;
+import com.example.federico.objects.GetPlaces;
+import com.example.federico.objects.Place;
+import com.example.federico.objects.PlacesList;
 
 //import com.google.api.client.http.json.JsonHttpParser;
 
 // ESTA LA TENGO import com.google.api.client.json.jackson.JacksonFactory;
 
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import im.delight.android.webrequest.WebRequest;
-import im.delight.android.webrequest.WebRequest.Callback;
-import objects.GPSTraker;
-import objects.ProvisionalContainer;
+import com.example.federico.objects.GPSTraker;
+import com.example.federico.objects.ProvisionalContainer;
 
 public class StartActivity extends Activity{
 

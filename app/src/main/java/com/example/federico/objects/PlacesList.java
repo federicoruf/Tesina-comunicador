@@ -1,8 +1,8 @@
-package objects;
+package com.example.federico.objects;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
+
 import com.google.api.client.util.Key;
 
 public class PlacesList implements Serializable {
