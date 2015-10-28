@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.federico.sqlite.DatabaseAdapter;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import com.example.federico.objects.Category;
@@ -40,8 +41,10 @@ import com.example.federico.objects.PlacesList;
 // ESTA LA TENGO import com.google.api.client.json.jackson.JacksonFactory;
 
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import com.example.federico.objects.GPSTraker;
@@ -69,6 +72,7 @@ public class StartActivity extends Activity{
     private GPSTraker tracker;
     private EditText inputSearchPlace;
     private PlacesList placesList;
+    private DatabaseAdapter dbAdapter;
     private String finalTranslation;
 
     /*Creates a dialog for an error message*/
@@ -110,12 +114,18 @@ public class StartActivity extends Activity{
         setContentView(R.layout.activity_start);
         this.context = StartActivity.this;
         this.tracker = new GPSTraker(this.context);
+        /*
+        la app es capaz de funcionar ahora con gps, lo dejo el código xq tal vez puede sacar algo de aca.
         if (this.tracker.getLocation() == null) {
            Toast.makeText(StartActivity.this, "Por favor habilite el GPS", Toast.LENGTH_LONG).show();
         }
+        */
         this.placesList = new PlacesList();
 
         this.translation = new HashMap<String, String>();
+
+        //creación del comunicador con la base de datos
+        this.dbAdapter = new DatabaseAdapter(context);
 
         //lista de los resultados encontrados
         this.listView = (ListView) findViewById(R.id.listViewResultsSearch);
@@ -147,22 +157,25 @@ public class StartActivity extends Activity{
 
                 //toma el valor ingresado en el input
                 String placeToSearch = String.valueOf(inputSearchPlace.getText());
-                ArrayList<Category> categories = ProvisionalContainer.businessEnglishNames(placeToSearch);
-
+                //ArrayList<Category> categories = ProvisionalContainer.businessEnglishNames(placeToSearch);
+                ArrayList<Category> categories = null;
+                try {
+                    categories = dbAdapter.getAllCategoriesThatMatchWith(placeToSearch);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 //cierra el teclado en pantalla(al arracar la app tiene el foco en el campo de la busqueda)
                 InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
-                //listener para los resultados de la busqueda y abre una nueva activity
+                //para q sirve este if?
                 if (categories.size()>0) {
+                    //pregunta si el gps esta activado, si lo esta usa google places para mostrar los lugares
+                    //si no esta, usa directamente las categorias almacenadas
                     if (tracker.getLocation() != null) {
                         try {
-                            placeToSearch = "";
-                            for (Category c : categories) {
-                                placeToSearch = placeToSearch.concat(c.getEnglishName() + "|");
-                            }
-                            System.out.println("plasdsdad: " + placeToSearch);
-                            placeToSearch = placeToSearch.substring(0, (placeToSearch.length() - 1));
+                            placeToSearch = concatTypes(categories);
+
 
                             String TempSQL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
                                     + "location=" + tracker.getLatitude() + "," + tracker.getLongitude()
@@ -188,15 +201,20 @@ public class StartActivity extends Activity{
                         textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.results.size());
                         ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getPlacesName());
                         listView.setAdapter(adapter);
+                        //listener para los elementos encontrados
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 String item = parent.getAdapter().getItem(position).toString();
+                                //obtiene de la lista de lugares el que fue seleccionado
                                 Place place = placesList.getPlace(item);
-                                Category cat = ProvisionalContainer.businessNamesByPlace(place);
-                                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                                intent.putExtra("Place", cat.getName());
-                                startActivity(intent);
+                                try {
+                                    //obtiene el objeto category correspondiente a uno de los tipos del place
+                                    Category cat = dbAdapter.getCategoryLikeFromPlace(place);
+                                    startMainActivity(cat.getName());
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     } else {
@@ -211,9 +229,7 @@ public class StartActivity extends Activity{
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 String item = parent.getAdapter().getItem(position).toString();
-                                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                                intent.putExtra("Place", item);
-                                startActivity(intent);
+                                startMainActivity(item);
                             }
                         });
                     }
@@ -244,7 +260,35 @@ public class StartActivity extends Activity{
 
             }
         });
+        //CÓDIGO DE PRUEBA PARA EL FUNCIONAMIENTO DE LA bd
+        try {
+            List<Category> allCategories = dbAdapter.getAllCategories();
+            for (Category ca: allCategories) {
+                System.out.println("nombre: " + ca.getName());
+                System.out.println("nombre ingles: " + ca.getEnglishName());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+
+    //concatena las categorias encontradas para ser usadas en el url de googleplace y devolver los lugares q coincidan
+    private String concatTypes(ArrayList<Category> categories) {
+        String placeToSearch = "";
+        for (Category c : categories) {
+            placeToSearch = placeToSearch.concat(c.getEnglishName() + "|");
+        }
+        placeToSearch = placeToSearch.replace(" ", "%20");
+        placeToSearch = placeToSearch.substring(0, (placeToSearch.length() - 1));
+        return placeToSearch;
+    }
+
+    private void startMainActivity(String category){
+        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+        intent.putExtra("categorySpanish", category);
+        startActivity(intent);
+    }
+
     private ArrayList<String> getPlacesName() {
         ArrayList<String> namesPlaces = new ArrayList<String>();
         for(String key: this.placesList.results.keySet()){

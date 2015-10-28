@@ -1,5 +1,10 @@
 package com.example.federico.objects;
 
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.federico.sqlite.DatabaseAdapter;
+
 import java.util.ArrayList;
 
 /**
@@ -55,5 +60,16 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public static Category cursorToCategory(Cursor cursor) {
+        Category category = null;
+        if (cursor != null) {
+           category = new Category();
+            category.setId(cursor.getInt(cursor.getColumnIndex(DatabaseAdapter.COLUMN_ID)));
+            category.setName(cursor.getString(cursor.getColumnIndex(DatabaseAdapter.COLUMN_NAME)));
+            category.setEnglishName(cursor.getString(cursor.getColumnIndex(DatabaseAdapter.COLUMN_ENGLISH_NAME)));
+        }
+        return category;
     }
 }

@@ -19,81 +19,70 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.federico.objects.Category;
+import com.example.federico.objects.Phrase;
+import com.example.federico.sqlite.DatabaseAdapter;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
 
+    //mensajes para mostrar en los toast relacionados al MainActivity
+    private static String NEW_PHRASE = "Se agrego con exito una nueva frase";
+    private static String NO_VOICE_RECOGNITION  = "No se encuentra disponible la herramienta voice recognizer";
+    private static String PHRASE_REPEATED = "La frase ya existe";
+
     private TextView textViewChat;
     private TextToSpeech textToSpeech;
-    private ImageButton imgBtSpeech;
-    private EditText editText;
-    private String place;
+    private ImageButton setImgButtonSpeech;
+    private Button buttonChoosePhrase;
+    private Button buttonSpeak;
+    private ImageButton imageButton;
+    private EditText editPhrase;
+    private ScrollView scrollViewChat;
+
+    private String categorySpanish;
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
+    private DatabaseAdapter dbAdapter;
+    private MainActivity context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.context = MainActivity.this;
+        this.dbAdapter = new DatabaseAdapter(context);
         Intent intent = getIntent();
-        this.place = intent.getStringExtra("Place");
-
-        this.textViewChat = (TextView) findViewById(R.id.textOutput);
-        this.imgBtSpeech = (ImageButton) findViewById(R.id.imageButtonMicrophone);
-        this.editText = (EditText) findViewById(R.id.speakPhrase);
-
-        //botón que abre el activitity con todas las frases de la categoría
-        Button buttonChoosePhrase = (Button) findViewById(R.id.buttonChoosePhrase);
-        buttonChoosePhrase.setOnClickListener(new OnClickListener() {
-            public void onClick(View view) {
-                Intent i = new Intent(getBaseContext(), ListPhrasesActivity.class);
-                i.putExtra("Place", place);
-                startActivityForResult(i, 1);
-            }
-        });
-
-        //objeto para poder escuchar la frase elegida
-        this.textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR) {
-                    Locale locSpanish = new Locale("spa", "ARG");
-                    textToSpeech.setLanguage(locSpanish);
-                }
-            }
-        });
-
-        //botón para que el celular haga sonar la frase elegida
-        Button buttonSpeak = (Button) findViewById(R.id.buttonSpeak);
-        buttonSpeak.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ScrollView scrollViewChat = (ScrollView) findViewById(R.id.scrollViewChat);
-                Editable phrase = editText.getText();
-                addText("yo: " + phrase);
-                //esta deprecado, pero si agrego un null al final no lo estará, pero esa versión no esta disponible para APIs antiguas
-                textToSpeech.speak(String.valueOf(phrase), TextToSpeech.QUEUE_FLUSH, null);
-            }
-        });
-
-        //botón para agregar frase a la categoría actualmente seleccionada
-        ImageButton imageButton = (ImageButton)findViewById(R.id.imageButtonPlus);
-        imageButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //agrega la frase a la BD tomando en cuenta la categoría
-
-
-            }
-        });
+        this.categorySpanish = intent.getStringExtra("categorySpanish");
 
         //reconocedor de voz
-        checkVoiceRecognition();
+        checkVoiceRecognitionIsPresent();
 
+        this.textViewChat = (TextView) findViewById(R.id.textOutput);
+        this.editPhrase = (EditText) findViewById(R.id.speakPhrase);
 
+        //botón que abre el activitity con todas las frases de la categoría
+        this.setButtonChoosePhrase();
 
-        this.imgBtSpeech.setOnClickListener(new OnClickListener() {
+        //objeto para poder escuchar la frase elegida
+        this.setTextToSpeech();
+
+        //botón para que el celular haga sonar la frase elegida
+        this.setButtonSpeak();
+
+        //botón para agregar frase a la categoría actualmente seleccionada
+        this.setImageButton();
+
+        //botón para el micrófono
+        this.setImgButtonSpeech();
+    }
+
+    private void setImgButtonSpeech() {
+        this.setImgButtonSpeech = (ImageButton) findViewById(R.id.imageButtonMicrophone);
+        this.setImgButtonSpeech.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -125,13 +114,74 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void checkVoiceRecognition() {
+    private void setImageButton() {
+        this.imageButton = (ImageButton)findViewById(R.id.imageButtonPlus);
+        this.imageButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //agrega la frase a la BD tomando en cuenta la categoría
+                String phrase = editPhrase.getText().toString();
+                try {
+                    Category category = dbAdapter.getCategoryFromSpanishName(categorySpanish);
+                    Phrase newPhrase = new Phrase(phrase, category.getId());
+                    long newId = dbAdapter.addPhraseToCategory(Phrase.toContentValues(newPhrase));
+                    if ( newId != -1) {
+                        showToastMessage(NEW_PHRASE);
+                    } else {
+                        showToastMessage(PHRASE_REPEATED);
+                    }
+                    newPhrase.setId(newId);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void setButtonSpeak() {
+        this.buttonSpeak = (Button) findViewById(R.id.buttonSpeak);
+        this.buttonSpeak.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrollViewChat = (ScrollView) findViewById(R.id.scrollViewChat);
+                Editable phrase = editPhrase.getText();
+                addText("yo: " + phrase);
+                //esta deprecado, pero si agrego un null al final no lo estará, pero esa versión no esta disponible para APIs antiguas
+                textToSpeech.speak(String.valueOf(phrase), TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
+    }
+
+    private void setTextToSpeech() {
+        this.textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    Locale locSpanish = new Locale("spa", "ARG");
+                    textToSpeech.setLanguage(locSpanish);
+                }
+            }
+        });
+    }
+
+    private void setButtonChoosePhrase() {
+        this.buttonChoosePhrase = (Button) findViewById(R.id.buttonChoosePhrase);
+        this.buttonChoosePhrase.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                Intent i = new Intent(getBaseContext(), ListPhrasesActivity.class);
+                i.putExtra("categorySpanish", categorySpanish);
+                startActivityForResult(i, 1);
+            }
+        });
+    }
+
+    private void checkVoiceRecognitionIsPresent() {
         // Check if voice recognition is present
         PackageManager pm = getPackageManager();
         List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         if (activities.size() == 0) {
-            this.imgBtSpeech.setEnabled(false);
-            Toast.makeText(this, "Voice recognizer not present", Toast.LENGTH_SHORT).show();
+            this.setImgButtonSpeech.setEnabled(false);
+            this.showToastMessage(NO_VOICE_RECOGNITION);
         }
     }
 
@@ -165,7 +215,7 @@ public class MainActivity extends Activity {
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
                 String val = data.getStringExtra("Phrase");
-                this.editText.setText(val);
+                this.editPhrase.setText(val);
             }
         }
     }

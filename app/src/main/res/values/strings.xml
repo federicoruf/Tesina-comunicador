@@ -11,7 +11,7 @@
     <string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>
     <string name="choose_phrase">Elegir frase</string>
     <string name="title_activity_start">StartActivity</string>
-    <string name="buscar_lugar">Buscar lugar</string>
+    <string name="buscar_lugar">Buscar categoría</string>
     <string name="descargar_conversacion">Descargar conversación</string>
     <string name="activate_gps">Activar GPS</string>
     <string name="title_activity_main2">Main2Activity</string>
