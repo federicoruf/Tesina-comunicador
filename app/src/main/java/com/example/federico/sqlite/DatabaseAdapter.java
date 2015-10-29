@@ -157,4 +157,21 @@ public class DatabaseAdapter {
         }
         return phrasesFounded;
     }
+
+    public long deletePhrase(String phrase) throws SQLException {
+        this.isOpen();
+        return database.delete(TABLE_PHRASES, COLUMN_PHRASE + " = '" + phrase + "'", null);
+    }
+
+    public long updatePhrase(String oldPhrase, String updatedPhrase, Category category) throws SQLException {
+        this.isOpen();
+        long id = category.getId();
+        if (!this.existPhrase(updatedPhrase, (String.valueOf(id)))) {
+            Phrase updatedPh = new Phrase(updatedPhrase, category.getId());
+            ContentValues contentValues = Phrase.toContentValues(updatedPh);
+            return database.update(TABLE_PHRASES, contentValues, COLUMN_PHRASE + " = '" + oldPhrase + "' AND " +
+                    COLUMN_CATEGORY_ID + " = '" + category.getId() + "'" , null);
+        }
+        return -1;
+    }
 }

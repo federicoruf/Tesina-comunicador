@@ -30,11 +30,6 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
 
-    //mensajes para mostrar en los toast relacionados al MainActivity
-    private static String NEW_PHRASE = "Se agrego con exito una nueva frase";
-    private static String NO_VOICE_RECOGNITION  = "No se encuentra disponible la herramienta voice recognizer";
-    private static String PHRASE_REPEATED = "La frase ya existe";
-
     private TextView textViewChat;
     private TextToSpeech textToSpeech;
     private ImageButton setImgButtonSpeech;
@@ -126,9 +121,9 @@ public class MainActivity extends Activity {
                     Phrase newPhrase = new Phrase(phrase, category.getId());
                     long newId = dbAdapter.addPhraseToCategory(Phrase.toContentValues(newPhrase));
                     if ( newId != -1) {
-                        showToastMessage(NEW_PHRASE);
+                        showToastMessage(getResources().getString(R.string.new_phrase));
                     } else {
-                        showToastMessage(PHRASE_REPEATED);
+                        showToastMessage(getResources().getString(R.string.phrase_repeated));
                     }
                     newPhrase.setId(newId);
                 } catch (SQLException e) {
@@ -181,7 +176,7 @@ public class MainActivity extends Activity {
         List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         if (activities.size() == 0) {
             this.setImgButtonSpeech.setEnabled(false);
-            this.showToastMessage(NO_VOICE_RECOGNITION);
+            this.showToastMessage(getResources().getString(R.string.no_voice_recognition));
         }
     }
 

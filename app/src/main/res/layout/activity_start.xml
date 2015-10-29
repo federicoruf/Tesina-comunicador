@@ -16,10 +16,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/buttonDownload"
-        android:layout_alignEnd="@+id/buttonDownload"
         android:nextFocusUp="@id/editTextSearchPlace"
-        android:nextFocusLeft="@id/editTextSearchPlace"/>
+        android:nextFocusLeft="@id/editTextSearchPlace"
+        android:layout_alignRight="@+id/buttonSearchPlace"
+        android:layout_alignEnd="@+id/buttonSearchPlace" />
 
     <Button
         android:id="@+id/buttonSearchPlace"
@@ -31,21 +31,30 @@
         android:layout_alignParentEnd="true" />
 
     <Button
+        android:id="@+id/buttonSearchPlaceName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/buscar_lugar_por_nombre"
+        android:layout_below="@+id/buttonSearchPlace"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+<!--
+    <Button
         android:id="@+id/buttonDownload"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_Download"
-        android:layout_below="@+id/buttonSearchPlace"
+        android:layout_below="@+id/buttonSearchPlaceName"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
+-->
     <CheckBox
         android:id="@+id/checkBoxGps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/activate_gps"
         android:textSize="18dp"
-        android:layout_below="@+id/buttonDownload"
+        android:layout_below="@+id/buttonSearchPlaceName"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

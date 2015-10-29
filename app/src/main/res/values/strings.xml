@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">My Application</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_download">Descargar conversación</string>
     <string name="button_speak">Hablar</string>
     <string name="microphono">Micrófono</string>
     <string name="ListaFrases">Lista de frases</string>
@@ -11,11 +10,29 @@
     <string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>
     <string name="choose_phrase">Elegir frase</string>
     <string name="title_activity_start">StartActivity</string>
-    <string name="buscar_lugar">Buscar categoría</string>
+    <string name="buscar_lugar">Buscar por categoría</string>
     <string name="descargar_conversacion">Descargar conversación</string>
     <string name="activate_gps">Activar GPS</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="button_Download">Desargar conversación</string>
     <string name="category_phrases">Frases de categoría:</string>
     <string name="searchResutls">Resultados de la busqueda</string>
+
+    <!--MAIN ACTIVITY-->
+    <string name="new_phrase">Se agrego con exito una nueva frase</string>
+    <string name="no_voice_recognition">No se encuentra disponible la herramienta voice recognizer</string>
+    <string name="phrase_repeated">La frase ya existe</string>
+
+    <!--LIST PHRASES ACTIVITY-->
+    <string name="phrase_updated">Frase actualizada</string>
+
+    <!--MENU CONTEXTUAL-->
+    <string name="menu_edit">Editar</string>
+    <string name="menu_delete">Eliminar</string>
+    <string name="delete_title">Eliminar</string>
+    <string name="delete_message">¿Seguro que quiere eliminar la frase?</string>
+    <string name="phrase_deleted">Frase eliminada</string>
+    <string name="input_phrase_edit">Ingrese la frase:</string>
+    <string name="buscar_lugar_por_nombre">Buscar lugar</string>
+    <string name="action_settings">settings</string>
 </resources>
