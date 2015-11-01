@@ -19,7 +19,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper  {
 
     //cada vez q hago un cambio en la BD, tengo q cambiar la versión
-    private static int version = 3;
+    private static int version = 4;
     private static String name = "TackLouderDb" ;
     private static SQLiteDatabase.CursorFactory factory = null;
 
@@ -62,6 +62,9 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
         db.execSQL("INSERT INTO " + DatabaseAdapter.TABLE_CATEGORIES + "(" +
                 DatabaseAdapter.COLUMN_ID + ", " + DatabaseAdapter.COLUMN_NAME + ", " + DatabaseAdapter.COLUMN_ENGLISH_NAME +
                 ") VALUES(6, 'cine', 'cinema')");
+        db.execSQL("INSERT INTO " + DatabaseAdapter.TABLE_CATEGORIES + "(" +
+                DatabaseAdapter.COLUMN_ID + ", " + DatabaseAdapter.COLUMN_NAME + ", " + DatabaseAdapter.COLUMN_ENGLISH_NAME +
+                ") VALUES(7, 'default', 'default')");
 
         db.execSQL("INSERT INTO " + DatabaseAdapter.TABLE_PHRASES + "(" +
                 DatabaseAdapter.COLUMN_ID+", "+DatabaseAdapter.COLUMN_PHRASE+", "+DatabaseAdapter.COLUMN_CATEGORY_ID+
@@ -152,6 +155,16 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
         db.execSQL("INSERT INTO " + DatabaseAdapter.TABLE_PHRASES + "(" +
                 DatabaseAdapter.COLUMN_ID+", "+DatabaseAdapter.COLUMN_PHRASE+", "+DatabaseAdapter.COLUMN_CATEGORY_ID+
                 ") VALUES(28, 'cuanto cuesta la noche?', 1)");
+
+        db.execSQL("INSERT INTO " + DatabaseAdapter.TABLE_PHRASES + "(" +
+                DatabaseAdapter.COLUMN_ID+", "+DatabaseAdapter.COLUMN_PHRASE+", "+DatabaseAdapter.COLUMN_CATEGORY_ID+
+                ") VALUES(29, 'donde esta la comisaría?', 7)");
+        db.execSQL("INSERT INTO " + DatabaseAdapter.TABLE_PHRASES + "(" +
+                DatabaseAdapter.COLUMN_ID+", "+DatabaseAdapter.COLUMN_PHRASE+", "+DatabaseAdapter.COLUMN_CATEGORY_ID+
+                ") VALUES(30, 'hola buen día', 7)");
+        db.execSQL("INSERT INTO " + DatabaseAdapter.TABLE_PHRASES + "(" +
+                DatabaseAdapter.COLUMN_ID+", "+DatabaseAdapter.COLUMN_PHRASE+", "+DatabaseAdapter.COLUMN_CATEGORY_ID+
+                ") VALUES(31, 'adios', 7)");
     }
 
     @Override

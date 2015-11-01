@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -69,6 +70,7 @@ public class StartActivity extends Activity{
     private CheckBox checkBoxGps;
     private Button buttonSearchPlaceName;
     private TextView textViewResultsSearch;
+    private Button buttonChatNow;
 
     private HashMap<String, String> translation;
     private ArrayList<String> result3;
@@ -79,13 +81,14 @@ public class StartActivity extends Activity{
     private DatabaseAdapter dbAdapter;
     private String finalTranslation;
     private GetPlaces getPlaces;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         this.context = StartActivity.this;
         this.tracker = new GPSTraker(this.context);
-        this.getPlaces = new GetPlaces();
+
         /*
         la app es capaz de funcionar ahora con gps, lo dejo el código xq tal vez puede sacar algo de aca.
         if (this.tracker.getLocation() == null) {
@@ -98,12 +101,18 @@ public class StartActivity extends Activity{
         //creación del comunicador con la base de datos
         this.dbAdapter = new DatabaseAdapter(context);
 
-        //lista de los resultados encontrados
-        this.listView = (ListView) findViewById(R.id.listViewResultsSearch);
         // input del texto a buscar
         this.inputSearchPlace = (EditText) findViewById(R.id.editTextSearchPlace);
+
         //texto de resultados de la busqueda
         this.textViewResultsSearch = (TextView) findViewById(R.id.textViewResultsSearch);
+
+        //lista de los resultados encontrados
+        try {
+            this.setListView();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         //botón de busqueda por CATEGORÍA
         this.setButtonSearchCategory();
@@ -114,10 +123,54 @@ public class StartActivity extends Activity{
         //Botón para realizar la búsqueda a partir de NOMBRE DEL LUGAR
         this.setButtonSearchPlaceName();
 
+        //Botón para hablar ahora
+        this.setButtonChatNow();
+
         //chequea si esta halitado el gps y actualiza el cehckbox según como este.
         LocationManager mlocManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);;
         boolean enabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         this.checkBoxGps.setChecked(enabled);
+    }
+
+    private void setButtonChatNow() {
+        this.buttonChatNow = (Button) findViewById(R.id.buttonChatNow);
+        this.buttonChatNow.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startMainActivity("default");
+            }
+        });
+    }
+
+    private void setListView() throws SQLException {
+        this.listView = (ListView) findViewById(R.id.listViewResultsSearch);
+        if (tracker.getLocation() != null) {
+            String concatTypes = concatTypes((ArrayList<Category>) dbAdapter.getAllCategories());
+            this.setResultSearchWithGPSByCategory(concatTypes);
+        }
+    }
+
+    private void setResultSearchWithGPSByCategory(String placeToSearch) throws SQLException {
+        String TempSQL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+                + "location=" + tracker.getLatitude() + "," + tracker.getLongitude()
+                + "&types=" + placeToSearch
+                + "&rankby=distance"
+                + "&key=" + API_KEY;
+        System.out.println(TempSQL);
+        getPlaces = new GetPlaces();
+        AsyncTask<String, Void, String> execute1 = getPlaces.execute(TempSQL);
+        //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
+
+        try {
+            getPlaces.get();
+            placesList = getPlaces.placesList;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.results.size());
+        createListByPlacesNames();
     }
 
     //cierra el teclado en pantalla(al arracar la app tiene el foco en el campo de la busqueda)
@@ -145,7 +198,7 @@ public class StartActivity extends Activity{
                                 + "&rankby=distance"
                                 + "&key=" + API_KEY;
                         System.out.println(TempSQL);
-
+                        getPlaces = new GetPlaces();
                         AsyncTask<String, Void, String> execute1 = getPlaces.execute(TempSQL);
                         //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
                         getPlaces.get();
@@ -162,7 +215,7 @@ public class StartActivity extends Activity{
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }  else {
+                } else {
                     Toast.makeText(StartActivity.this, "Debe tener habilitado el GPS para realizar la busqueda por lugar", Toast.LENGTH_LONG).show();
                 }
             }
@@ -174,13 +227,40 @@ public class StartActivity extends Activity{
         this.checkBoxGps.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //reinicia el tracker para que tome la ubicación correctamente
-                tracker = new GPSTraker(context);
-                tracker.showSettingsAlert(checkBoxGps);
+                int i= 0;
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                context.startActivityForResult(intent, i);
+                context.onActivityResult(i, 0, intent);
             }
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("result code " + resultCode);
+        if(resultCode == 0) {
+            //reinicia el tracker para que tome la ubicación correctamente
+            this.tracker = new GPSTraker(this.context);
+            System.out.println("enabled: " + this.tracker.isCanGetLocation());
+            checkBoxGps.setChecked(this.tracker.isCanGetLocation());
+            if (this.tracker.isCanGetLocation()) {
+                try {
+                    System.out.println("lat: " + this.tracker.getLatitude() + "long: " + this.tracker.getLongitude());
+                    String concatTypes = concatTypes((ArrayList<Category>) dbAdapter.getAllCategories());
+                    setResultSearchWithGPSByCategory(concatTypes);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                this.textViewResultsSearch.setText("Resultados de la busqueda");
+
+               // this.listView.;
+               this.listView.setAdapter(null);
+
+            }
+        }
+
+    }
     private void setButtonSearchCategory() {
         this.buttonSearchCategory = (Button) findViewById(R.id.buttonSearchPlace);
         buttonSearchCategory.setOnClickListener(new OnClickListener() {
@@ -205,28 +285,10 @@ public class StartActivity extends Activity{
                     if (tracker.getLocation() != null) {
                         try {
                             placeToSearch = concatTypes(categories);
-                            String TempSQL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
-                                    + "location=" + tracker.getLatitude() + "," + tracker.getLongitude()
-                                    //ACA CONFIGURAS EL RADIO!, ESTA EN METROS, EN ESTE CASO ESTARÍA SETEADO 2000M
-                                    //SI NO SE ESPECIFICA, EL MAX ES DE 50KM
-                                    //+ "&radious=2000&types=hospital"
-                                    + "&types=" + placeToSearch
-                                    //ESTO ES Q ORDENE LOS LUGARES A MOSTRAR DE MENOS A MAS LEJOS ESTA DE MI UBICACIÓN ACTUAL
-                                    + "&rankby=distance"
-                                    + "&key=" + API_KEY;
-                            System.out.println(TempSQL);
-                            AsyncTask<String, Void, String> execute1 = getPlaces.execute(TempSQL);
-                            //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
-
-                            getPlaces.get();
-                            placesList = getPlaces.placesList;
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
+                            setResultSearchWithGPSByCategory(placeToSearch);
+                        } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.results.size());
-                        createListByPlacesNames();
                     } else {
                         ArrayList<String> catNames = new ArrayList<String>();
                         for (Category c: categories) {

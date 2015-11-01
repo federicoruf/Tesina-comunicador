@@ -1,27 +1,28 @@
 <resources>
     <string name="app_name">My Application</string>
 
-    <string name="action_download">Descargar conversación</string>
-    <string name="button_speak">Hablar</string>
-    <string name="microphono">Micrófono</string>
     <string name="ListaFrases">Lista de frases</string>
     <string name="title_activity_talk">Talk</string>
     <string name="title_activity_list_phrases">ListPhrasesActivity</string>
     <string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>
-    <string name="choose_phrase">Elegir frase</string>
-    <string name="title_activity_start">StartActivity</string>
-    <string name="buscar_lugar">Buscar por categoría</string>
-    <string name="descargar_conversacion">Descargar conversación</string>
-    <string name="activate_gps">Activar GPS</string>
+
     <string name="title_activity_main2">Main2Activity</string>
     <string name="button_Download">Desargar conversación</string>
     <string name="category_phrases">Frases de categoría:</string>
+
+    <!--START ACTIVITY-->
     <string name="searchResutls">Resultados de la busqueda</string>
+    <string name="activate_gps">Activar GPS</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="buscar_lugar">Buscar por categoría</string>
 
     <!--MAIN ACTIVITY-->
     <string name="new_phrase">Se agrego con exito una nueva frase</string>
     <string name="no_voice_recognition">No se encuentra disponible la herramienta voice recognizer</string>
     <string name="phrase_repeated">La frase ya existe</string>
+    <string name="button_speak">Hablar</string>
+    <string name="microphono">Micrófono</string>
+    <string name="choose_phrase">Elegir frase</string>
 
     <!--LIST PHRASES ACTIVITY-->
     <string name="phrase_updated">Frase actualizada</string>
@@ -34,5 +35,10 @@
     <string name="phrase_deleted">Frase eliminada</string>
     <string name="input_phrase_edit">Ingrese la frase:</string>
     <string name="buscar_lugar_por_nombre">Buscar lugar</string>
+
+    <!--ACTION VAR-->
+    <string name="descargar_conversacion">Descargar conversación</string>
     <string name="action_settings">settings</string>
+    <string name="action_download">Descargar conversación</string>
+    <string name="button_chat_now">Hablar ahora</string>
 </resources>
