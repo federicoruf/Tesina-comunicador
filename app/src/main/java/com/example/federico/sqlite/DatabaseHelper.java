@@ -40,7 +40,6 @@ public class DatabaseHelper extends SQLiteOpenHelper  {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        System.out.println("REINICIA LA BASE DE DATOS");
         db.execSQL(CREATE_TABLE_CATEGORIES);
         db.execSQL(CREATE_TABLE_PHRASES);
 
