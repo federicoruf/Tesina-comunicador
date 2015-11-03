@@ -4,17 +4,23 @@ package com.example.federico.myapplication;
 //import com.google.api.translate.Translate;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
+import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,10 +31,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.federico.objects.Phrase;
 import com.example.federico.sqlite.DatabaseAdapter;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -46,10 +55,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Locale;
 
 import com.example.federico.objects.GPSTraker;
-import com.example.federico.objects.ProvisionalContainer;
 
 public class StartActivity extends Activity{
 
@@ -61,26 +69,35 @@ public class StartActivity extends Activity{
     private static final String DIALOG_ERROR = "dialog_error";
     //Bool to track whether the app is already resolving an error
     private boolean mResolvingError = false;
-    //key de la aplicación
-    private static final String API_KEY = "AIzaSyAQcafXWJo0QxU46U16EbmWSogIYklYbRc";
+    //para cargar el valor del extra así sabe que tipo de busqueda debe hacer, las dejo publicas así las accede otra activity
+    public static final String TYPE_SEARCH = "TYPE_SEARCH";
+    public static final String VALUE_TO_SEARCH = "VALUE_TO_SEARCH";
+    public static final String GPS_ENABLE = "GPS_ENABLE";
+    public static final String LAT_LONG = "LAT_LONG";
+    private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
 
     //hashmap que tiene las traducciones de los lugares buscados, para así puedo
-    private ListView listView;
     private Button buttonSearchCategory;
     private CheckBox checkBoxGps;
     private Button buttonSearchPlaceName;
-    private TextView textViewResultsSearch;
-    private Button buttonChatNow;
+    private EditText inputSearchPlace;
+    private TextView textViewChat;
+    private EditText editPhrase;
+    private ImageButton setImgButtonSpeech;
+    private ImageButton imageButton;
+    private Button buttonSpeak;
+    private TextToSpeech textToSpeech;
+    private Button buttonChoosePhrase;
+    private ScrollView scrollViewChat;
 
+
+    private String finalTranslation;
+    private GPSTraker tracker;
+    private String categorySpanish;
     private HashMap<String, String> translation;
     private ArrayList<String> result3;
     private StartActivity context;
-    private GPSTraker tracker;
-    private EditText inputSearchPlace;
-    private PlacesList placesList;
     private DatabaseAdapter dbAdapter;
-    private String finalTranslation;
-    private GetPlaces getPlaces;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -88,31 +105,12 @@ public class StartActivity extends Activity{
         setContentView(R.layout.activity_start);
         this.context = StartActivity.this;
         this.tracker = new GPSTraker(this.context);
-
-        /*
-        la app es capaz de funcionar ahora con gps, lo dejo el código xq tal vez puede sacar algo de aca.
-        if (this.tracker.getLocation() == null) {
-           Toast.makeText(StartActivity.this, "Por favor habilite el GPS", Toast.LENGTH_LONG).show();
-        }
-        */
-        this.placesList = new PlacesList();
-        this.translation = new HashMap<String, String>();
-
-        //creación del comunicador con la base de datos
         this.dbAdapter = new DatabaseAdapter(context);
+
+        this.translation = new HashMap<String, String>();
 
         // input del texto a buscar
         this.inputSearchPlace = (EditText) findViewById(R.id.editTextSearchPlace);
-
-        //texto de resultados de la busqueda
-        this.textViewResultsSearch = (TextView) findViewById(R.id.textViewResultsSearch);
-
-        //lista de los resultados encontrados
-        try {
-            this.setListView();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
         //botón de busqueda por CATEGORÍA
         this.setButtonSearchCategory();
@@ -123,101 +121,143 @@ public class StartActivity extends Activity{
         //Botón para realizar la búsqueda a partir de NOMBRE DEL LUGAR
         this.setButtonSearchPlaceName();
 
-        //Botón para hablar ahora
-        this.setButtonChatNow();
-
         //chequea si esta halitado el gps y actualiza el cehckbox según como este.
         LocationManager mlocManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);;
         boolean enabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         this.checkBoxGps.setChecked(enabled);
+
+        //reconocedor de voz
+        checkVoiceRecognitionIsPresent();
+
+        this.textViewChat = (TextView) findViewById(R.id.textOutput);
+        this.editPhrase = (EditText) findViewById(R.id.speakPhrase);
+
+        //botón que abre el activitity con todas las frases de la categoría
+        this.setButtonChoosePhrase();
+
+        //objeto para poder escuchar la frase elegida
+        this.setTextToSpeech();
+
+        //botón para que el celular haga sonar la frase elegida
+        this.setButtonSpeak();
+
+        //botón para agregar frase a la categoría actualmente seleccionada
+        this.setImageButton();
+
+        //botón para el micrófono
+        this.setImgButtonSpeech();
+
+        Intent intent = getIntent();
+        this.categorySpanish = intent.getStringExtra("categorySpanish");
+        System.out.println("result 2, hizo ya la busqueda " + this.categorySpanish);
+
+        ActionBar ab = null;
+        if ((android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) && (this.categorySpanish !=  null)) {
+            ab = getActionBar();
+            ab.setTitle("Categoría elegida: " + this.categorySpanish);
+        }
     }
 
-    private void setButtonChatNow() {
-        this.buttonChatNow = (Button) findViewById(R.id.buttonChatNow);
-        this.buttonChatNow.setOnClickListener(new OnClickListener() {
+    private void setImgButtonSpeech() {
+        this.setImgButtonSpeech = (ImageButton) findViewById(R.id.imageButtonMicrophone);
+        this.setImgButtonSpeech.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startMainActivity("default");
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                // Specify the calling package to identify your application
+                //CON ESTA LINEA PUEDO USAR SIN TENER CONEXIÓN A INTERNET, PERO Q PASA, PRIMERO TIENE Q HABER BAJADO AL CELULAR EL PAQUETE DE ESPAÑOL.
+                //NO FUCIONA, NO ENTIENDO XQ.
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es");
+
+                intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
+                // Display an hint to the user about what he should say.
+                //intent.putExtra(RecognizerIntent.EXTRA_PROMPT, metTextHint.getText().toString());
+                // Given an hint to the recognizer about what the user is going to say
+                //There are two form of language model available
+                //1.LANGUAGE_MODEL_WEB_SEARCH : For short phrases
+                //2.LANGUAGE_MODEL_FREE_FORM  : If not sure about the words or phrases and its domain.
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+                // If number of Matches is not selected then return show toast message
+                /*if (msTextMatches.getSelectedItemPosition() == AdapterView.INVALID_POSITION) {
+                    Toast.makeText(this, "Please select No. of Matches from spinner", Toast.LENGTH_SHORT).show();
+                    return;
+                }*/
+                //int noOfMatches = Integer.parseInt(msTextMatches.getSelectedItem().toString());
+                // Specify how many results you want to receive. The results will be
+                // sorted where the first result is the one with higher confidence.
+                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+                //Start the Voice recognizer activity for the result.
+                startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
             }
         });
     }
 
-    private void setListView() throws SQLException {
-        this.listView = (ListView) findViewById(R.id.listViewResultsSearch);
-        if (tracker.getLocation() != null) {
-            String concatTypes = concatTypes((ArrayList<Category>) dbAdapter.getAllCategories());
-            this.setResultSearchWithGPSByCategory(concatTypes);
-        }
-    }
-
-    private void setResultSearchWithGPSByCategory(String placeToSearch) throws SQLException {
-        String TempSQL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
-                + "location=" + tracker.getLatitude() + "," + tracker.getLongitude()
-                + "&types=" + placeToSearch
-                + "&rankby=distance"
-                + "&key=" + API_KEY;
-        System.out.println(TempSQL);
-        getPlaces = new GetPlaces();
-        AsyncTask<String, Void, String> execute1 = getPlaces.execute(TempSQL);
-        //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
-
-        try {
-            getPlaces.get();
-            placesList = getPlaces.placesList;
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.results.size());
-        createListByPlacesNames();
-    }
-
-    //cierra el teclado en pantalla(al arracar la app tiene el foco en el campo de la busqueda)
-    private void closeKeyboard(){
-        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-    }
-
-    private void setButtonSearchPlaceName() {
-        this.buttonSearchPlaceName = (Button) findViewById(R.id.buttonSearchPlaceName);
-        buttonSearchPlaceName.setOnClickListener(new OnClickListener() {
+    private void setImageButton() {
+        this.imageButton = (ImageButton)findViewById(R.id.imageButtonPlus);
+        this.imageButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //PREGUNTAR SI ESTA HABILITADO EL GPS, PARA ASÍ BUSCA POR LUGAR
-                //ES NECESARIO CONOCER SU UBICACIÓN PARA OBTENER LOS NOMBRE DE LUGARES CERCA DE DONDE SE ENCUENTRA, DESEA HABILITAR EL GPS?
-                if (tracker.getLocation() != null) {
-                    //toma el valor ingresado en el input
-                    String placeToSearch = String.valueOf(inputSearchPlace.getText());
-
-                    closeKeyboard();
-                    try {
-                        String TempSQL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
-                                + "location=" + tracker.getLatitude() + "," + tracker.getLongitude()
-                                + "&name=" + placeToSearch
-                                + "&rankby=distance"
-                                + "&key=" + API_KEY;
-                        System.out.println(TempSQL);
-                        getPlaces = new GetPlaces();
-                        AsyncTask<String, Void, String> execute1 = getPlaces.execute(TempSQL);
-                        //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
-                        getPlaces.get();
-                        placesList = getPlaces.placesList;
-                        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.results.size());
-                        if (placesList.results.size() != 0) {
-                            createListByPlacesNames();
-                        } else {
-                            textViewResultsSearch.setText("Resultados de la busqueda: 0");
-                            listView.setAdapter(null);
-                        }
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                //agrega la frase a la BD tomando en cuenta la categoría
+                String phrase = editPhrase.getText().toString();
+                try {
+                    Category category = dbAdapter.getCategoryFromSpanishName(categorySpanish);
+                    Phrase newPhrase = new Phrase(phrase, category.getId());
+                    long newId = dbAdapter.addPhraseToCategory(Phrase.toContentValues(newPhrase));
+                    if ( newId != -1) {
+                        showToastMessage(getResources().getString(R.string.new_phrase));
+                    } else {
+                        showToastMessage(getResources().getString(R.string.phrase_repeated));
                     }
-                } else {
-                    Toast.makeText(StartActivity.this, "Debe tener habilitado el GPS para realizar la busqueda por lugar", Toast.LENGTH_LONG).show();
+                    newPhrase.setId(newId);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    private void setButtonSpeak() {
+        this.buttonSpeak = (Button) findViewById(R.id.buttonSpeak);
+        this.buttonSpeak.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrollViewChat = (ScrollView) findViewById(R.id.scrollViewChat);
+                Editable phrase = editPhrase.getText();
+                addText("yo: " + phrase);
+                //esta deprecado, pero si agrego un null al final no lo estará, pero esa versión no esta disponible para APIs antiguas
+                textToSpeech.speak(String.valueOf(phrase), TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
+    }
+
+    private void setTextToSpeech() {
+        this.textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    Locale locSpanish = new Locale("spa", "ARG");
+                    textToSpeech.setLanguage(locSpanish);
+                }
+            }
+        });
+    }
+
+    private void addText(String text) {
+        this.textViewChat.invalidate();
+        this.textViewChat.requestLayout();
+        this.textViewChat.append(text + "\n");
+    }
+
+    private void setButtonChoosePhrase() {
+        this.buttonChoosePhrase = (Button) findViewById(R.id.buttonChoosePhrase);
+        this.buttonChoosePhrase.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                if (categorySpanish == null) {
+                    categorySpanish = "default";
+                }
+                Intent i = new Intent(getBaseContext(), ListPhrasesActivity.class);
+                i.putExtra("categorySpanish", categorySpanish);
+                startActivityForResult(i, 1);
             }
         });
     }
@@ -227,12 +267,62 @@ public class StartActivity extends Activity{
         this.checkBoxGps.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int i= 0;
+                int i = 0;
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 context.startActivityForResult(intent, i);
                 context.onActivityResult(i, 0, intent);
             }
         });
+    }
+
+    private void setButtonSearchPlaceName() {
+        this.buttonSearchPlaceName = (Button) findViewById(R.id.buttonSearchPlaceName);
+        buttonSearchPlaceName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(tracker.isCanGetLocation()){
+                    createIntentSearch("nameSearch");
+                } else {
+                    Toast.makeText(context, "Debe tener habilitado el GPS para realizar la busqueda por lugar", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void setButtonSearchCategory() {
+        this.buttonSearchCategory = (Button) findViewById(R.id.buttonSearchPlace);
+        buttonSearchCategory.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createIntentSearch("categorySearch");
+            }
+        });
+    }
+
+    private void checkVoiceRecognitionIsPresent() {
+        // Check if voice recognition is present
+        PackageManager pm = getPackageManager();
+        List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+        if (activities.size() == 0) {
+            this.setImgButtonSpeech.setEnabled(false);
+            this.showToastMessage(getResources().getString(R.string.no_voice_recognition));
+        }
+    }
+
+    private void showToastMessage(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void createIntentSearch(String typeSearch){
+        Intent intent = new Intent(getBaseContext(), ResultsSearchActivity.class);
+        intent.putExtra(TYPE_SEARCH, typeSearch);
+        intent.putExtra(VALUE_TO_SEARCH, this.inputSearchPlace.getText().toString());
+        System.out.println("gps enable: " + tracker.isCanGetLocation());
+        intent.putExtra(GPS_ENABLE, tracker.isCanGetLocation());
+        double[] latLog = {tracker.getLatitude(), tracker.getLongitude()};
+        intent.putExtra(LAT_LONG, latLog);
+        startActivityForResult(intent, 2);
+        context.onActivityResult(2, 2, intent);
     }
 
     @Override
@@ -242,122 +332,36 @@ public class StartActivity extends Activity{
             //reinicia el tracker para que tome la ubicación correctamente
             this.tracker = new GPSTraker(this.context);
             System.out.println("enabled: " + this.tracker.isCanGetLocation());
-            checkBoxGps.setChecked(this.tracker.isCanGetLocation());
-            if (this.tracker.isCanGetLocation()) {
-                try {
-                    System.out.println("lat: " + this.tracker.getLatitude() + "long: " + this.tracker.getLongitude());
-                    String concatTypes = concatTypes((ArrayList<Category>) dbAdapter.getAllCategories());
-                    setResultSearchWithGPSByCategory(concatTypes);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                this.textViewResultsSearch.setText("Resultados de la busqueda");
-
-               // this.listView.;
-               this.listView.setAdapter(null);
-
+        }
+        if (resultCode == 2) {
+        }
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                String val = data.getStringExtra("Phrase");
+                this.editPhrase.setText(val);
             }
         }
-
-    }
-    private void setButtonSearchCategory() {
-        this.buttonSearchCategory = (Button) findViewById(R.id.buttonSearchPlace);
-        buttonSearchCategory.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //toma el valor ingresado en el input
-                String placeToSearch = String.valueOf(inputSearchPlace.getText());
-                //ArrayList<Category> categories = ProvisionalContainer.businessEnglishNames(placeToSearch);
-                ArrayList<Category> categories = null;
-                try {
-                    categories = dbAdapter.getAllCategoriesThatMatchWith(placeToSearch);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
+            //If Voice recognition is successful then it returns RESULT_OK
+            if (resultCode == RESULT_OK) {
+                ArrayList<String> textMatchList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (!textMatchList.isEmpty()) {
+                    addText("el otro: " + textMatchList.get(0));
                 }
-                closeKeyboard();
-                //a partir del string buscado, este puede coincidir con varias categorias, si
-                // da como resultado 1 o +, entonces las concateno para realizar la busqueda con
-                //google places.
-                if (categories.size()>0) {
-                    //pregunta si el gps esta activado, si lo esta usa google places para mostrar los lugares
-                    //si no esta, usa directamente las categorias almacenadas
-                    if (tracker.getLocation() != null) {
-                        try {
-                            placeToSearch = concatTypes(categories);
-                            setResultSearchWithGPSByCategory(placeToSearch);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        ArrayList<String> catNames = new ArrayList<String>();
-                        for (Category c: categories) {
-                            catNames.add(c.getName());
-                        }
-                        textViewResultsSearch.setText("Resultados de la busqueda: " + catNames.size());
-                        ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, catNames);
-                        listView.setAdapter(adapter);
-                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                String item = parent.getAdapter().getItem(position).toString();
-                                startMainActivity(item);
-                            }
-                        });
-                    }
-                } else {
-                    textViewResultsSearch.setText("Resultados de la busqueda: 0");
-                    listView.setAdapter(null);
-                }
+                //Result code for various error.
+            } else if (resultCode == RecognizerIntent.RESULT_AUDIO_ERROR) {
+                showToastMessage("Audio Error");
+            } else if (resultCode == RecognizerIntent.RESULT_CLIENT_ERROR) {
+                showToastMessage("Client Error");
+            } else if (resultCode == RecognizerIntent.RESULT_NETWORK_ERROR) {
+                showToastMessage("Network Error");
+            } else if (resultCode == RecognizerIntent.RESULT_NO_MATCH) {
+                showToastMessage("No Match");
+            } else if (resultCode == RecognizerIntent.RESULT_SERVER_ERROR) {
+                showToastMessage("Server Error");
             }
-        });
-    }
-
-    //genera la vista de los resultado del tipo "nombre del lugar"
-    private void createListByPlacesNames(){
-        ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getPlacesName());
-        listView.setAdapter(adapter);
-        //listener para los elementos encontrados
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = parent.getAdapter().getItem(position).toString();
-                //obtiene de la lista de lugares el que fue seleccionado
-                Place place = placesList.getPlace(item);
-                try {
-                    //obtiene el objeto category correspondiente a uno de los tipos del place
-                    Category cat = dbAdapter.getCategoryLikeFromPlace(place);
-                    startMainActivity(cat.getName());
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    //concatena las categorias encontradas para ser usadas en el url de googleplace y devolver los lugares q coincidan
-    private String concatTypes(ArrayList<Category> categories) {
-        String placeToSearch = "";
-        for (Category c : categories) {
-            placeToSearch = placeToSearch.concat(c.getEnglishName() + "|");
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        placeToSearch = placeToSearch.replace(" ", "%20");
-        placeToSearch = placeToSearch.substring(0, (placeToSearch.length() - 1));
-        return placeToSearch;
-    }
-
-    private void startMainActivity(String category){
-        Intent intent = new Intent(getBaseContext(), MainActivity.class);
-        intent.putExtra("categorySpanish", category);
-        startActivity(intent);
-    }
-
-    private ArrayList<String> getPlacesName() {
-        ArrayList<String> namesPlaces = new ArrayList<String>();
-        for(String key: this.placesList.results.keySet()){
-            namesPlaces.add(key);
-        }
-        return namesPlaces;
     }
 
     @Override
@@ -377,17 +381,6 @@ public class StartActivity extends Activity{
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /*Creates a dialog for an error message*/
-    private void showErrorDialog(int errorCode) {
-        // create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        //lo configura como un dialog, pero usa un metodo desconocido "getSupportFragmentManager()"
-        Toast.makeText(StartActivity.this, args.getString("DIALOG_ERROR"), Toast.LENGTH_LONG).show();
     }
 
     /*called from ErrorDialogFragment when the dialog is dismissed*/

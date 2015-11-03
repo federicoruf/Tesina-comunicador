@@ -13,20 +13,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/editTextSearchPlace"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:nextFocusUp="@id/editTextSearchPlace"
-        android:nextFocusLeft="@id/editTextSearchPlace"
-        android:layout_alignRight="@+id/buttonSearchPlace"
-        android:layout_alignEnd="@+id/buttonSearchPlace" />
+        android:layout_below="@+id/buttonChoosePhrase"
+        android:layout_alignRight="@+id/imageButtonMicrophone"
+        android:layout_alignEnd="@+id/imageButtonMicrophone" />
 
     <Button
         android:id="@+id/buttonSearchPlace"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/buscar_lugar"
-        android:layout_below="@+id/editTextSearchPlace"
+        android:layout_above="@+id/buttonSearchPlaceName"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -35,18 +33,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/buscar_lugar_por_nombre"
-        android:layout_below="@+id/buttonSearchPlace"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:id="@+id/buttonChatNow"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_chat_now"
-        android:layout_below="@+id/buttonSearchPlaceName"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_above="@+id/checkBoxGps"
+        android:layout_alignRight="@+id/imageButtonMicrophone"
+        android:layout_alignEnd="@+id/imageButtonMicrophone" />
 
     <CheckBox
         android:id="@+id/checkBoxGps"
@@ -54,26 +43,86 @@
         android:layout_height="wrap_content"
         android:text="@string/activate_gps"
         android:textSize="18dp"
-        android:layout_below="@+id/buttonChatNow"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"/>
+
+    <ScrollView
+        android:id="@+id/scrollViewChat"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:fillViewport="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/speakPhrase">
+        <TextView
+            android:id="@+id/textOutput"
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="5dp"
+            android:textSize="20dp"
+            android:lineSpacingExtra="7dp"/>
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/imageButtonMicrophone"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#ffffff"
+        android:layout_gravity="bottom"
+        android:adjustViewBounds="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+
+        android:src="@drawable/microphone1"
+        android:contentDescription="@string/microphono"
+        android:layout_alignTop="@+id/buttonSpeak" />
+
+    <Button
+        android:id="@+id/buttonChoosePhrase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/choose_phrase"
+        android:layout_below="@+id/speakPhrase"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <TextView
+    <EditText
+        android:id="@+id/speakPhrase"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/searchResutls"
-        android:textSize="16dp"
-        android:id="@+id/textViewResultsSearch"
-        android:layout_below="@+id/checkBoxGps"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:nextFocusUp="@id/speakPhrase"
+        android:nextFocusLeft="@id/speakPhrase"
+        android:layout_centerVertical="true"
 
-    <ListView
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/imageButtonMicrophone"
+        android:layout_toStartOf="@+id/imageButtonMicrophone" />
+
+    <Button
+        android:id="@+id/buttonSpeak"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/listViewResultsSearch"
-        android:layout_below="@+id/textViewResultsSearch"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="@string/button_speak"
+
+        android:layout_below="@+id/speakPhrase"
+        android:layout_centerHorizontal="true" />
+
+    <ImageButton
+        android:id="@+id/imageButtonPlus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/plus1"
+        android:adjustViewBounds="false"
+        android:nestedScrollingEnabled="false"
+        android:layout_above="@+id/imageButtonMicrophone"
+        android:layout_toRightOf="@+id/speakPhrase"
+        android:layout_below="@+id/scrollViewChat"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

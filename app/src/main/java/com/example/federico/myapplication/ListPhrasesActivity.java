@@ -53,6 +53,7 @@ public class ListPhrasesActivity extends Activity {
             this.category = dbAdapter.getCategoryFromSpanishName(categoryName);
             //this.category = ProvisionalContainer.getPhrasesFrom(place);
             if (category != null) {
+                System.out.println("resultado: " + category.getName());
                 this.textViewFracesCategoria = (TextView) findViewById(R.id.textViewCategoryPhrases);
                 textViewFracesCategoria.setText("Frases de la categoría: " + category.getName());
 
