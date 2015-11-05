@@ -7,4 +7,9 @@
         android:title="@string/action_download"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_activate_GPS"
+        android:title="@string/activate_GPS"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>

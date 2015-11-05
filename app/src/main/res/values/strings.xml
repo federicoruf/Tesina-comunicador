@@ -12,7 +12,6 @@
 
     <!--START ACTIVITY-->
     <string name="searchResutls">Resultados de la busqueda</string>
-    <string name="activate_gps">Activar GPS</string>
     <string name="title_activity_start">StartActivity</string>
     <string name="buscar_lugar">Buscar por categoría</string>
 
@@ -36,9 +35,12 @@
     <string name="input_phrase_edit">Ingrese la frase:</string>
     <string name="buscar_lugar_por_nombre">Buscar lugar</string>
 
+
+    <string name="button_chat_now">Hablar ahora</string>
     <!--ACTION VAR-->
-    <string name="descargar_conversacion">Descargar conversación</string>
     <string name="action_settings">settings</string>
     <string name="action_download">Descargar conversación</string>
-    <string name="button_chat_now">Hablar ahora</string>
+    <string name="opciones">opciones</string>
+    <string name="activate_GPS">Activar GPS</string>
+    <string name="deactivate_GPS">Desactivar GPS</string>
 </resources>

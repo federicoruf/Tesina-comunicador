@@ -48,23 +48,13 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <CheckBox
-        android:id="@+id/checkBoxGps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/activate_gps"
-        android:textSize="18dp"
-        android:layout_below="@+id/buttonChatNow"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/searchResutls"
         android:textSize="16dp"
         android:id="@+id/textViewResultsSearch"
-        android:layout_below="@+id/checkBoxGps"
+        android:layout_below="@+id/buttonChatNow"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

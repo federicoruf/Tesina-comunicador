@@ -23,7 +23,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,10 +66,10 @@ public class StartActivity extends Activity{
     //hashmap que tiene las traducciones de los lugares buscados, para así puedo
     private ListView listView;
     private Button buttonSearchCategory;
-    private CheckBox checkBoxGps;
     private Button buttonSearchPlaceName;
     private TextView textViewResultsSearch;
     private Button buttonChatNow;
+    private Menu menu;
 
     private HashMap<String, String> translation;
     private ArrayList<String> result3;
@@ -117,8 +116,6 @@ public class StartActivity extends Activity{
         //botón de busqueda por CATEGORÍA
         this.setButtonSearchCategory();
 
-        //checkbox para habilitar el gps
-        this.setCheckBoxGPS();
 
         //Botón para realizar la búsqueda a partir de NOMBRE DEL LUGAR
         this.setButtonSearchPlaceName();
@@ -129,7 +126,6 @@ public class StartActivity extends Activity{
         //chequea si esta halitado el gps y actualiza el cehckbox según como este.
         LocationManager mlocManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);;
         boolean enabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        this.checkBoxGps.setChecked(enabled);
     }
 
     private void setButtonChatNow() {
@@ -222,19 +218,6 @@ public class StartActivity extends Activity{
         });
     }
 
-    private void setCheckBoxGPS() {
-        this.checkBoxGps = (CheckBox) findViewById(R.id.checkBoxGps);
-        this.checkBoxGps.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int i= 0;
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                context.startActivityForResult(intent, i);
-                context.onActivityResult(i, 0, intent);
-            }
-        });
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         System.out.println("result code " + resultCode);
@@ -242,7 +225,6 @@ public class StartActivity extends Activity{
             //reinicia el tracker para que tome la ubicación correctamente
             this.tracker = new GPSTraker(this.context);
             System.out.println("enabled: " + this.tracker.isCanGetLocation());
-            checkBoxGps.setChecked(this.tracker.isCanGetLocation());
             if (this.tracker.isCanGetLocation()) {
                 try {
                     System.out.println("lat: " + this.tracker.getLatitude() + "long: " + this.tracker.getLongitude());
@@ -253,11 +235,9 @@ public class StartActivity extends Activity{
                 }
             } else {
                 this.textViewResultsSearch.setText("Resultados de la busqueda");
-
-               // this.listView.;
-               this.listView.setAdapter(null);
-
+                this.listView.setAdapter(null);
             }
+            this.setActionBarGpsStatus();
         }
 
     }
@@ -279,7 +259,7 @@ public class StartActivity extends Activity{
                 //a partir del string buscado, este puede coincidir con varias categorias, si
                 // da como resultado 1 o +, entonces las concateno para realizar la busqueda con
                 //google places.
-                if (categories.size()>0) {
+                if (categories.size() > 0) {
                     //pregunta si el gps esta activado, si lo esta usa google places para mostrar los lugares
                     //si no esta, usa directamente las categorias almacenadas
                     if (tracker.getLocation() != null) {
@@ -291,7 +271,7 @@ public class StartActivity extends Activity{
                         }
                     } else {
                         ArrayList<String> catNames = new ArrayList<String>();
-                        for (Category c: categories) {
+                        for (Category c : categories) {
                             catNames.add(c.getName());
                         }
                         textViewResultsSearch.setText("Resultados de la busqueda: " + catNames.size());
@@ -360,10 +340,20 @@ public class StartActivity extends Activity{
         return namesPlaces;
     }
 
+    private void setActionBarGpsStatus() {
+        if (!this.tracker.isCanGetLocation()) {
+            this.menu.getItem(1).setTitle(getResources().getString(R.string.activate_GPS));
+        } else {
+            this.menu.getItem(1).setTitle(getResources().getString(R.string.deactivate_GPS));
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        System.out.println("PEIRDE TIEMPO!!!");
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_start, menu);
+        this.setActionBarGpsStatus();
         return true;
     }
 
@@ -371,11 +361,21 @@ public class StartActivity extends Activity{
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will automatically handle clicks on
         // the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_download) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_download:
+                System.out.println("clickeoooo");
+                return true;
+
+            case R.id.action_activate_GPS:
+                int i = 0;
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                context.startActivityForResult(intent, i);
+                context.onActivityResult(i, 0, intent);
+                return true;
+
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 
