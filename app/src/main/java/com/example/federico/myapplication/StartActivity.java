@@ -328,7 +328,7 @@ public class StartActivity extends Activity{
     }
 
     private void startMainActivity(String category){
-        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+        Intent intent = new Intent(getBaseContext(), ChatActivity.class);
         intent.putExtra("categorySpanish", category);
         startActivity(intent);
     }

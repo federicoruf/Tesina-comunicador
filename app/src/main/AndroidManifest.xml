@@ -27,11 +27,11 @@
         </activity>
         <activity
             android:name=".ListPhrasesActivity"
-            android:label="@string/title_activity_list_phrases">
+            android:label="@string/title_activity_list_phrases" >
         </activity>
         <activity
             android:name=".StartActivity"
-            android:label="@string/title_activity_start">
+            android:label="@string/title_activity_start" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,6 +41,11 @@
         <activity
             android:name=".CreateCategoryActivity"
             android:label="@string/title_activity_create_category" >
+        </activity>
+        <activity
+            android:name=".ChatActivity"
+            android:label="@string/title_activity_chat"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

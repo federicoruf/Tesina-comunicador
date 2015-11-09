@@ -22,6 +22,11 @@
     <string name="button_speak">Hablar</string>
     <string name="microphono">Micrófono</string>
     <string name="choose_phrase">Elegir frase</string>
+    <string name="other_talk">Oyente</string>
+    <string name="myself">Yo</string>
+    <string name="inputSelectPhrase">Ingrese o seleccione su frase</string>
+    <string name="listenerPerson">Oyente</string>
+    <string name="speak_button">Hablar</string>
 
     <!--LIST PHRASES ACTIVITY-->
     <string name="phrase_updated">Frase actualizada</string>
@@ -52,4 +57,5 @@
     <string name="add_new_phrase">Agregar frase</string>
     <string name="button_add_category">Agregar categoría</string>
     <string name="category_added">Se agrego exitosamente la categoría</string>
+    <string name="title_activity_chat">ChatActivity</string>
 </resources>
