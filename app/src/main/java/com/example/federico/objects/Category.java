@@ -1,5 +1,6 @@
 package com.example.federico.objects;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -72,4 +73,14 @@ public class Category {
         }
         return category;
     }
+
+    public static ContentValues toContentValues(Category category){
+        ContentValues reg = new ContentValues();
+        if (category.getId() == 0) {
+            reg.put(DatabaseAdapter.COLUMN_NAME, category.getName());
+            reg.put(DatabaseAdapter.COLUMN_ENGLISH_NAME, category.getEnglishName());
+        }
+        return reg;
+    }
+
 }

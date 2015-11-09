@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.federico.objects.Translator;
 import com.example.federico.sqlite.DatabaseAdapter;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -44,11 +45,9 @@ import com.example.federico.objects.PlacesList;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import com.example.federico.objects.GPSTraker;
-import com.example.federico.objects.ProvisionalContainer;
 
 public class StartActivity extends Activity{
 
@@ -68,6 +67,7 @@ public class StartActivity extends Activity{
     private Button buttonSearchCategory;
     private Button buttonSearchPlaceName;
     private TextView textViewResultsSearch;
+    private EditText inputSearchPlace;
     private Button buttonChatNow;
     private Menu menu;
 
@@ -75,11 +75,12 @@ public class StartActivity extends Activity{
     private ArrayList<String> result3;
     private StartActivity context;
     private GPSTraker tracker;
-    private EditText inputSearchPlace;
     private PlacesList placesList;
     private DatabaseAdapter dbAdapter;
     private String finalTranslation;
+
     private GetPlaces getPlaces;
+    private Translator translator;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -235,7 +236,7 @@ public class StartActivity extends Activity{
                 }
             } else {
                 this.textViewResultsSearch.setText("Resultados de la busqueda");
-                this.listView.setAdapter(null);
+               this.listView.setAdapter(null);
             }
             this.setActionBarGpsStatus();
         }
@@ -372,7 +373,10 @@ public class StartActivity extends Activity{
                 context.startActivityForResult(intent, i);
                 context.onActivityResult(i, 0, intent);
                 return true;
-
+            case R.id.action_create_category:
+                intent = new Intent(getBaseContext(), CreateCategoryActivity.class);
+                context.startActivity(intent);
+                return true;
         }
 
 

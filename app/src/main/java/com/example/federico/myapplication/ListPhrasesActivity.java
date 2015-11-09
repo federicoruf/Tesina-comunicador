@@ -47,8 +47,7 @@ public class ListPhrasesActivity extends Activity {
         this.context = ListPhrasesActivity.this;
         this.dbAdapter = new DatabaseAdapter(context);
 
-        Intent intent = getIntent();
-        String categoryName = intent.getStringExtra("categorySpanish");
+        String categoryName = getIntent().getStringExtra("categorySpanish");
         try {
             this.category = dbAdapter.getCategoryFromSpanishName(categoryName);
             //this.category = ProvisionalContainer.getPhrasesFrom(place);
@@ -67,7 +66,7 @@ public class ListPhrasesActivity extends Activity {
     private void setListView() throws SQLException {
         this.listView = (ListView) findViewById(R.id.list_phrases);
         this.loadPhrases();
-        listView.setOnItemClickListener(new OnItemClickListener() {
+        this.listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getAdapter().getItem(position).toString();
@@ -82,9 +81,9 @@ public class ListPhrasesActivity extends Activity {
     }
 
     private void loadPhrases() throws SQLException {
-        ArrayList<String> phrasesFromCategory = dbAdapter.getPhrasesFromCategory(this.category.getId());
+        ArrayList<String> phrasesFromCategory = this.dbAdapter.getPhrasesFromCategory(this.category.getId());
         this.listAdapter = new ArrayAdapter<String>(this, R.layout.activity_list_view_phrases, phrasesFromCategory);
-        listView.setAdapter(listAdapter);
+        this.listView.setAdapter(this.listAdapter);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

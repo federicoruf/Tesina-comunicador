@@ -43,4 +43,13 @@
     <string name="opciones">opciones</string>
     <string name="activate_GPS">Activar GPS</string>
     <string name="deactivate_GPS">Desactivar GPS</string>
+    <string name="create_category">Crear categoría</string>
+
+    <!--CREATE CATEGORY ACTIVITY-->
+    <string name="title_activity_create_category">CreateCategoryActivity</string>
+    <string name="category_name">Nombre de la cateogoría</string>
+    <string name="new_phrase_input">Nueva frase</string>
+    <string name="add_new_phrase">Agregar frase</string>
+    <string name="button_add_category">Agregar categoría</string>
+    <string name="category_added">Se agrego exitosamente la categoría</string>
 </resources>

@@ -12,4 +12,9 @@
         android:title="@string/activate_GPS"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_create_category"
+        android:title="@string/create_category"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>

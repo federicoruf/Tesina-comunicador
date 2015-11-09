@@ -130,13 +130,22 @@ public class DatabaseAdapter {
         return -1;
     }
 
+    public long addCategoryDatabase(ContentValues category) throws SQLException {
+        this.isOpen();
+        return database.insert(TABLE_CATEGORIES, null, category);
+    }
+
+    public boolean existsCategory(String category) throws SQLException {
+        this.isOpen();
+        String filter = COLUMN_NAME + " = '" + category + "'";
+        Cursor c = database.query(true, TABLE_CATEGORIES, columnsCategories, filter, null, null, null, null, null);
+        return (c.getCount()>0);
+    }
+
     private boolean existPhrase(String phrase, String categoryId) {
         String filter = COLUMN_CATEGORY_ID + " = '" + categoryId + "' AND " + COLUMN_PHRASE + " = '" + phrase + "'";
         Cursor c = database.query(true, TABLE_PHRASES, columnsPhrases, filter, null, null, null, null, null);
-        if (c.getCount()>0) {
-            return true;
-        }
-        return false;
+        return (c.getCount()>0);
     }
 
     public ArrayList<String> getPhrasesFromCategory(long id) throws SQLException {
