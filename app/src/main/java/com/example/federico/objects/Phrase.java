@@ -11,6 +11,8 @@ import com.example.federico.sqlite.DatabaseAdapter;
 public class Phrase {
 
     long id;
+    String textPhrase;
+    long categoryId;
 
     public Phrase() {
 
@@ -27,9 +29,6 @@ public class Phrase {
     public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
-
-    String textPhrase;
-    long categoryId;
 
     public Phrase(String textPhrase, long categoryId) {
         this.textPhrase = textPhrase;

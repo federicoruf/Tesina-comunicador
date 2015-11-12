@@ -1,8 +1,5 @@
 package com.example.federico.myapplication;
 
-//import com.google.api.translate.Language;
-//import com.google.api.translate.Translate;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
@@ -28,7 +25,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.federico.objects.Translator;
 import com.example.federico.sqlite.DatabaseAdapter;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -37,22 +33,15 @@ import com.example.federico.objects.GetPlaces;
 import com.example.federico.objects.Place;
 import com.example.federico.objects.PlacesList;
 
-//import com.google.api.client.http.json.JsonHttpParser;
-
-// ESTA LA TENGO import com.google.api.client.json.jackson.JacksonFactory;
-
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import com.example.federico.objects.GPSTraker;
 
 public class StartActivity extends Activity{
 
-
-    private static final String WIKI = "Matecat";
     //Request code to use when launching the resolution activity
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     //Unique tag for the error dialog fragment
@@ -71,16 +60,12 @@ public class StartActivity extends Activity{
     private Button buttonChatNow;
     private Menu menu;
 
-    private HashMap<String, String> translation;
-    private ArrayList<String> result3;
     private StartActivity context;
     private GPSTraker tracker;
     private PlacesList placesList;
     private DatabaseAdapter dbAdapter;
-    private String finalTranslation;
 
     private GetPlaces getPlaces;
-    private Translator translator;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -89,14 +74,7 @@ public class StartActivity extends Activity{
         this.context = StartActivity.this;
         this.tracker = new GPSTraker(this.context);
 
-        /*
-        la app es capaz de funcionar ahora con gps, lo dejo el código xq tal vez puede sacar algo de aca.
-        if (this.tracker.getLocation() == null) {
-           Toast.makeText(StartActivity.this, "Por favor habilite el GPS", Toast.LENGTH_LONG).show();
-        }
-        */
         this.placesList = new PlacesList();
-        this.translation = new HashMap<String, String>();
 
         //creación del comunicador con la base de datos
         this.dbAdapter = new DatabaseAdapter(context);
@@ -235,13 +213,18 @@ public class StartActivity extends Activity{
                     e.printStackTrace();
                 }
             } else {
-                this.textViewResultsSearch.setText("Resultados de la busqueda");
-               this.listView.setAdapter(null);
+               this.emptyResultSearch();
             }
             this.setActionBarGpsStatus();
         }
 
     }
+
+    private void emptyResultSearch() {
+        this.textViewResultsSearch.setText("Resultados de la busqueda: 0");
+        this.listView.setAdapter(null);
+    }
+
     private void setButtonSearchCategory() {
         this.buttonSearchCategory = (Button) findViewById(R.id.buttonSearchPlace);
         buttonSearchCategory.setOnClickListener(new OnClickListener() {
@@ -253,42 +236,37 @@ public class StartActivity extends Activity{
                 ArrayList<Category> categories = null;
                 try {
                     categories = dbAdapter.getAllCategoriesThatMatchWith(placeToSearch);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                closeKeyboard();
-                //a partir del string buscado, este puede coincidir con varias categorias, si
-                // da como resultado 1 o +, entonces las concateno para realizar la busqueda con
-                //google places.
-                if (categories.size() > 0) {
-                    //pregunta si el gps esta activado, si lo esta usa google places para mostrar los lugares
-                    //si no esta, usa directamente las categorias almacenadas
-                    if (tracker.getLocation() != null) {
-                        try {
+                    closeKeyboard();
+                    //a partir del string buscado, este puede coincidir con varias categorias, si
+                    // da como resultado 1 o +, entonces las concateno para realizar la busqueda con
+                    //google places.
+                    if (categories.size() > 0) {
+                        //pregunta si el gps esta activado, si lo esta usa google places para mostrar los lugares
+                        //si no esta, usa directamente las categorias almacenadas
+                        if (tracker.getLocation() != null) {
                             placeToSearch = concatTypes(categories);
                             setResultSearchWithGPSByCategory(placeToSearch);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
+                        } else {
+                            ArrayList<String> catNames = new ArrayList<String>();
+                            for (Category c : categories) {
+                                catNames.add(c.getName());
+                            }
+                            textViewResultsSearch.setText("Resultados de la busqueda: " + catNames.size());
+                            ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, catNames);
+                            listView.setAdapter(adapter);
+                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    String item = parent.getAdapter().getItem(position).toString();
+                                    startMainActivity(item);
+                                }
+                            });
                         }
                     } else {
-                        ArrayList<String> catNames = new ArrayList<String>();
-                        for (Category c : categories) {
-                            catNames.add(c.getName());
-                        }
-                        textViewResultsSearch.setText("Resultados de la busqueda: " + catNames.size());
-                        ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, catNames);
-                        listView.setAdapter(adapter);
-                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                String item = parent.getAdapter().getItem(position).toString();
-                                startMainActivity(item);
-                            }
-                        });
+                        emptyResultSearch();
                     }
-                } else {
-                    textViewResultsSearch.setText("Resultados de la busqueda: 0");
-                    listView.setAdapter(null);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -348,10 +326,10 @@ public class StartActivity extends Activity{
             this.menu.getItem(1).setTitle(getResources().getString(R.string.deactivate_GPS));
         }
     }
+
+    //setea el menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        System.out.println("PEIRDE TIEMPO!!!");
         this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_start, menu);
         this.setActionBarGpsStatus();
@@ -366,7 +344,6 @@ public class StartActivity extends Activity{
             case R.id.action_download:
                 System.out.println("clickeoooo");
                 return true;
-
             case R.id.action_activate_GPS:
                 int i = 0;
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);

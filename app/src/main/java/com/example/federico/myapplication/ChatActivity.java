@@ -56,7 +56,7 @@ public class ChatActivity extends Activity {
         Intent intent = getIntent();
         this.categorySpanish = intent.getStringExtra("categorySpanish");
 
-        this.textViewChat = (TextView) findViewById(R.id.textOutput);
+        //this.textViewChat = (TextView) findViewById(R.id.textOutput);
 
         //reconocedor de voz
         checkVoiceRecognitionIsPresent();
@@ -179,15 +179,19 @@ public class ChatActivity extends Activity {
                 if (TextUtils.isEmpty(messageText)) {
                     return;
                 }
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setMessage(messageText);
-                chatMessage.setMe(true);
+                createChatMessage(true, messageText);
                 editPhrase.setText("");
-                displayMessage(chatMessage);
                 //esta deprecado, pero si agrego un null al final no lo estará, pero esa versión no esta disponible para APIs antiguas
                 textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null, null);
             }
         });
+    }
+
+    private void createChatMessage(boolean itsMe, String messageText) {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setMessage(messageText);
+        chatMessage.setMe(itsMe);
+        displayMessage(chatMessage);
     }
 
     public void displayMessage(ChatMessage message) {
@@ -223,10 +227,7 @@ public class ChatActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 ArrayList<String> textMatchList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 if (!textMatchList.isEmpty()) {
-                    ChatMessage chatMessage = new ChatMessage();
-                    chatMessage.setMessage(textMatchList.get(0));
-                    chatMessage.setMe(false);
-                    displayMessage(chatMessage);
+                    createChatMessage(false, textMatchList.get(0));
                 }
                 //Result code for various error.
             } else if (resultCode == RecognizerIntent.RESULT_AUDIO_ERROR) {

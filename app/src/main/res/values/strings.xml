@@ -15,7 +15,7 @@
     <string name="title_activity_start">StartActivity</string>
     <string name="buscar_lugar">Buscar por categoría</string>
 
-    <!--MAIN ACTIVITY-->
+    <!--CHAT ACTIVITY-->
     <string name="new_phrase">Se agrego con exito una nueva frase</string>
     <string name="no_voice_recognition">No se encuentra disponible la herramienta voice recognizer</string>
     <string name="phrase_repeated">La frase ya existe</string>
@@ -27,6 +27,7 @@
     <string name="inputSelectPhrase">Ingrese o seleccione su frase</string>
     <string name="listenerPerson">Oyente</string>
     <string name="speak_button">Hablar</string>
+    <string name="title_activity_chat">ChatActivity</string>
 
     <!--LIST PHRASES ACTIVITY-->
     <string name="phrase_updated">Frase actualizada</string>
@@ -57,5 +58,4 @@
     <string name="add_new_phrase">Agregar frase</string>
     <string name="button_add_category">Agregar categoría</string>
     <string name="category_added">Se agrego exitosamente la categoría</string>
-    <string name="title_activity_chat">ChatActivity</string>
 </resources>

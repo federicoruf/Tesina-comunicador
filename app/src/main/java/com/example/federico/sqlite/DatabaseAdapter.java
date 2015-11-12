@@ -63,22 +63,23 @@ public class DatabaseAdapter {
                 categories.add(cat);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return categories;
     }
+
     //uno de los usos es para conseguir la categoría en español
     public Category getCategoryLikeFromPlace(Place place) throws SQLException {
         this.isOpen();
         ArrayList<String> typesPlace = place.types;
-
         for (String type: typesPlace) {
             String typeFilter = COLUMN_ENGLISH_NAME + "='" + type + "'";
             Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, typeFilter, null, null, null, null, null);
             if (cursor != null) {
                 cursor.moveToFirst();
-                Category cat = new Category();
-                cat = Category.cursorToCategory(cursor);
+                Category cat = Category.cursorToCategory(cursor);
                 return cat;
             }
+            cursor.close();
         }
         return null;
     }
@@ -93,6 +94,7 @@ public class DatabaseAdapter {
             cursor.moveToFirst();
             cat = Category.cursorToCategory(cursor);
         }
+        cursor.close();
         return cat;
     }
 
@@ -102,7 +104,6 @@ public class DatabaseAdapter {
         ArrayList<Category> categoriesFounded = new ArrayList<Category>();
         String startWithFilter = COLUMN_NAME + " LIKE '" + placeToSearch + "%'";
         Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, startWithFilter, null, null, null, null, null);
-
         if (cursor != null) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -110,6 +111,7 @@ public class DatabaseAdapter {
                 cursor.moveToNext();
             }
         }
+        cursor.close();
         return categoriesFounded;
     }
 
@@ -121,8 +123,6 @@ public class DatabaseAdapter {
 
     public long addPhraseToCategory(ContentValues phrase) throws SQLException {
         this.isOpen();
-        System.out.println("frase: " + phrase.get(DatabaseAdapter.COLUMN_PHRASE));
-        System.out.println("id: " + phrase.get(DatabaseAdapter.COLUMN_CATEGORY_ID));
         boolean exists = this.existPhrase(phrase.get(COLUMN_PHRASE).toString(),phrase.get(COLUMN_CATEGORY_ID).toString());
         if(!exists) {
             return database.insert(TABLE_PHRASES, null, phrase);
@@ -164,6 +164,7 @@ public class DatabaseAdapter {
         for (int i=0; i<phrasesFounded.size(); i++){
 
         }
+        cursor.close();
         return phrasesFounded;
     }
 

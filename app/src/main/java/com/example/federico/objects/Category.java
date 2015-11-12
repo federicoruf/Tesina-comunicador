@@ -33,22 +33,9 @@ public class Category {
         this.englishName = englishName;
     }
 
-    private ArrayList<String> phrases = new ArrayList<String>();
 
     public Category() {
 
-    }
-
-    public void addPhrase(String phrase){
-        phrases.add(phrase);
-    }
-
-    public ArrayList<String> getPhrases() {
-        return phrases;
-    }
-
-    public void setPhrases(ArrayList<String> phrases) {
-        this.phrases = phrases;
     }
 
     public Category(String name) {
