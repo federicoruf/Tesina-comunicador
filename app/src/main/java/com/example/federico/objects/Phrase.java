@@ -10,9 +10,9 @@ import com.example.federico.sqlite.DatabaseAdapter;
  */
 public class Phrase {
 
-    long id;
-    String textPhrase;
-    long categoryId;
+    private long id;
+    private String textPhrase;
+    private long categoryId;
 
     public Phrase() {
 

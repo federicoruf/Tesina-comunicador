@@ -1,4 +1,4 @@
-package com.example.federico.myapplication;
+package com.example.federico.activities;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -25,11 +25,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.federico.myapplication.R;
 import com.example.federico.sqlite.DatabaseAdapter;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import com.example.federico.objects.Category;
-import com.example.federico.objects.GetPlaces;
+import com.example.federico.background.GooglePlacesRequest;
 import com.example.federico.objects.Place;
 import com.example.federico.objects.PlacesList;
 
@@ -65,7 +66,7 @@ public class StartActivity extends Activity{
     private PlacesList placesList;
     private DatabaseAdapter dbAdapter;
 
-    private GetPlaces getPlaces;
+    private GooglePlacesRequest googlePlacesRequest;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -132,19 +133,19 @@ public class StartActivity extends Activity{
                 + "&rankby=distance"
                 + "&key=" + API_KEY;
         System.out.println(TempSQL);
-        getPlaces = new GetPlaces();
-        AsyncTask<String, Void, String> execute1 = getPlaces.execute(TempSQL);
+        googlePlacesRequest = new GooglePlacesRequest();
+        AsyncTask<String, Void, String> execute1 = googlePlacesRequest.execute(TempSQL);
         //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
 
         try {
-            getPlaces.get();
-            placesList = getPlaces.placesList;
+            googlePlacesRequest.get();
+            placesList = googlePlacesRequest.getPlacesList();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.results.size());
+        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.getResults().size());
         createListByPlacesNames();
     }
 
@@ -173,13 +174,13 @@ public class StartActivity extends Activity{
                                 + "&rankby=distance"
                                 + "&key=" + API_KEY;
                         System.out.println(TempSQL);
-                        getPlaces = new GetPlaces();
-                        AsyncTask<String, Void, String> execute1 = getPlaces.execute(TempSQL);
+                        googlePlacesRequest = new GooglePlacesRequest();
+                        AsyncTask<String, Void, String> execute1 = googlePlacesRequest.execute(TempSQL);
                         //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
-                        getPlaces.get();
-                        placesList = getPlaces.placesList;
-                        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.results.size());
-                        if (placesList.results.size() != 0) {
+                        googlePlacesRequest.get();
+                        placesList = googlePlacesRequest.getPlacesList();
+                        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.getResults().size());
+                        if (placesList.getResults().size() != 0) {
                             createListByPlacesNames();
                         } else {
                             textViewResultsSearch.setText("Resultados de la busqueda: 0");
@@ -313,7 +314,7 @@ public class StartActivity extends Activity{
 
     private ArrayList<String> getPlacesName() {
         ArrayList<String> namesPlaces = new ArrayList<String>();
-        for(String key: this.placesList.results.keySet()){
+        for(String key: this.placesList.getResults().keySet()){
             namesPlaces.add(key);
         }
         return namesPlaces;

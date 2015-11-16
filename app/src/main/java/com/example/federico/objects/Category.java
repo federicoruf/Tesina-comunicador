@@ -13,9 +13,10 @@ import java.util.ArrayList;
  */
 
 public class Category {
-    long id;
-    String name;
-    String englishName;
+
+    private long id;
+    private String name;
+    private String englishName;
 
     public long getId() {
         return this.id;

@@ -78,10 +78,6 @@ public class ChatAdapter extends BaseAdapter {
         this.chatMessages.add(message);
     }
 
-    public void add(List<ChatMessage> messages) {
-        this.chatMessages.addAll(messages);
-    }
-
     //dibuja la frase hablada en el chat y dependiendo de quien la dice la dibuja a la izquierda o derecha
     private void setAlignment(ViewHolder holder, boolean isMe) {
         if (isMe) {

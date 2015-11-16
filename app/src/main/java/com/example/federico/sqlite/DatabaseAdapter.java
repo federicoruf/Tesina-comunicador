@@ -70,7 +70,7 @@ public class DatabaseAdapter {
     //uno de los usos es para conseguir la categoría en español
     public Category getCategoryLikeFromPlace(Place place) throws SQLException {
         this.isOpen();
-        ArrayList<String> typesPlace = place.types;
+        ArrayList<String> typesPlace = place.getTypes();
         for (String type: typesPlace) {
             String typeFilter = COLUMN_ENGLISH_NAME + "='" + type + "'";
             Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, typeFilter, null, null, null, null, null);

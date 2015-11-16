@@ -6,13 +6,42 @@ import java.util.ArrayList;
 
 public class Place {
 
-    public String id;
+    private String id;
+    private String name;
+    private Geometry geometry;
+    private ArrayList<String> types;
 
-    public String name;
+    public Geometry getGeometry() {
+        return geometry;
+    }
 
-    public Geometry geometry;
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
+    }
 
-    public ArrayList<String> types;
+    public ArrayList<String> getTypes() {
+        return types;
+    }
+
+    public void setTypes(ArrayList<String> types) {
+        this.types = types;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public static class Geometry implements Serializable {
         public Location location;

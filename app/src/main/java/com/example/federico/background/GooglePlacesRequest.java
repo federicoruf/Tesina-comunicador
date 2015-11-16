@@ -1,14 +1,7 @@
-package com.example.federico.objects;
+package com.example.federico.background;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.example.federico.objects.Place;
+import com.example.federico.objects.PlacesList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,9 +9,9 @@ import org.json.JSONObject;
 /**
  * Created by federico on 20/10/2015.
  */
-public class GetPlaces extends UrlRequest {
+public class GooglePlacesRequest extends UrlRequest {
 
-    public PlacesList placesList;
+    private PlacesList placesList;
 
     @Override
     protected String doInBackground(String... placesURL) {
@@ -35,14 +28,14 @@ public class GetPlaces extends UrlRequest {
                 Place newPlace = new Place();
                 JSONObject placeObject = placesArray.getJSONObject(p);
                 JSONObject loc = placeObject.getJSONObject("geometry").getJSONObject("location");
-                newPlace.geometry.location.lat = (Double.valueOf(loc.getString("lat")));
-                newPlace.geometry.location.lng = (Double.valueOf(loc.getString("lng")));
+                newPlace.getGeometry().location.lat = (Double.valueOf(loc.getString("lat")));
+                newPlace.getGeometry().location.lng = (Double.valueOf(loc.getString("lng")));
                 JSONArray types = placeObject.getJSONArray("types");
                 for(int t=0; t<types.length(); t++){
                     String thisType = types.get(t).toString();
-                    newPlace.types.add(thisType);
+                    newPlace.getTypes().add(thisType);
                 }
-                newPlace.name = placeObject.getString("name");
+                newPlace.setName(placeObject.getString("name"));
                 this.placesList.addPlace(newPlace);
             }
         } catch (JSONException e1) {
@@ -50,4 +43,13 @@ public class GetPlaces extends UrlRequest {
         }
         return String.valueOf(this.placesList);
     }
+
+    public PlacesList getPlacesList() {
+        return placesList;
+    }
+
+    public void setPlacesList(PlacesList placesList) {
+        this.placesList = placesList;
+    }
+
 }

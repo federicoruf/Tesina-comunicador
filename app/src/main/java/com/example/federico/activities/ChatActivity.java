@@ -1,4 +1,4 @@
-package com.example.federico.myapplication;
+package com.example.federico.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -7,19 +7,18 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
-import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.federico.chatObjects.ChatAdapter;
 import com.example.federico.chatObjects.ChatMessage;
+import com.example.federico.myapplication.R;
 import com.example.federico.objects.Category;
 import com.example.federico.objects.Phrase;
 import com.example.federico.sqlite.DatabaseAdapter;

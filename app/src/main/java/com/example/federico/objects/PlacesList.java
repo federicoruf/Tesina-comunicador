@@ -5,14 +5,11 @@ import java.util.HashMap;
 
 import com.google.api.client.util.Key;
 
-public class PlacesList implements Serializable {
-    @Key
-    public String status;
-    @Key
-    public HashMap<String, Place> results;
+public class PlacesList{
+    private HashMap<String, Place> results;
 
     public void addPlace(Place place) {
-        this.results.put(place.name, place);
+        this.results.put(place.getName(), place);
     }
     public PlacesList() {
         this.results = new HashMap<String, Place>();
@@ -20,4 +17,13 @@ public class PlacesList implements Serializable {
     public Place getPlace(String name) {
         return this.results.get(name);
     }
+
+    public HashMap<String, Place> getResults() {
+        return results;
+    }
+
+    public void setResults(HashMap<String, Place> results) {
+        this.results = results;
+    }
+
 }

@@ -25,16 +25,16 @@ public class GPSTraker extends Service implements LocationListener{
     private final Context mContext;
 
     //flag for GPS status
-    boolean isGPSEnabled = false;
+    private boolean isGPSEnabled = false;
 
     //flag for network status
-    boolean isNetworkEnabled = false;
+    private boolean isNetworkEnabled = false;
 
-    boolean canGetLocation = false;
+    private boolean canGetLocation = false;
 
-    Location location;
-    double latitude;
-    double longitude;
+    private Location location;
+    private double latitude;
+    private double longitude;
 
     //minimum distance to change updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
@@ -67,34 +67,6 @@ public class GPSTraker extends Service implements LocationListener{
                 return null;
             } else {
                 this.canGetLocation = true;
-                /*
-                //first get location from network provider
-                if (this.isNetworkEnabled) {
-                    this.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Log.d("Network", "Network");
-                    if(this.locationManager != null) {
-                        this.location = this.locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        if (location !=  null) {
-                            this.latitude = this.location.getLatitude();
-                            this.longitude = this.location.getLongitude();
-                        }
-                    }
-                }
-                //if GPS enabled get lat/long using GPS services
-                if (this.isGPSEnabled) {
-                    if (this.location == null) {
-                        this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                        Log.d("GPS Enabled", "GPS Enabled");
-                        if (this.locationManager != null) {
-                            this.location = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            if (this.location != null) {
-                                this.latitude = this.location.getLatitude();
-                                this.longitude = this.location.getLongitude();
-                            }
-                        }
-                    }
-                }
-                */
                 if (this.isGPSEnabled) {
                     this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                     Log.d("GPS Enabled", "GPS Enabled");
@@ -175,6 +147,4 @@ public class GPSTraker extends Service implements LocationListener{
     public void setCanGetLocation(boolean canGetLocation) {
         this.canGetLocation = canGetLocation;
     }
-
-
 }

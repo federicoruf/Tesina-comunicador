@@ -16,12 +16,12 @@
             android:value="AIzaSyAQcafXWJo0QxU46U16EbmWSogIYklYbRc" />
 
         <activity
-            android:name=".ListPhrasesActivity"
+            android:name="com.example.federico.activities.ListPhrasesActivity"
             android:label="@string/title_activity_list_phrases"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".StartActivity"
+            android:name="com.example.federico.activities.StartActivity"
             android:label="@string/title_activity_start"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -31,12 +31,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreateCategoryActivity"
+            android:name="com.example.federico.activities.CreateCategoryActivity"
             android:label="@string/title_activity_create_category"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".ChatActivity"
+            android:name="com.example.federico.activities.ChatActivity"
             android:label="@string/title_activity_chat"
             android:screenOrientation="portrait">
         </activity>

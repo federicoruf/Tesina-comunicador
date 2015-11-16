@@ -1,4 +1,4 @@
-package com.example.federico.myapplication;
+package com.example.federico.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,8 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.federico.myapplication.R;
 import com.example.federico.objects.Category;
-import com.example.federico.objects.Phrase;
 import com.example.federico.sqlite.DatabaseAdapter;
 
 import java.sql.SQLException;
