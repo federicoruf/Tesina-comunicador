@@ -1,25 +1,16 @@
 package com.example.federico.objects;
 
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.CheckBox;
 
-import com.example.federico.myapplication.R;
-
-/**
- * Created by federico on 08/10/2015.
- */
 public class GPSTraker extends Service implements LocationListener{
 
     private final Context mContext;
@@ -77,7 +68,6 @@ public class GPSTraker extends Service implements LocationListener{
                             this.longitude = this.location.getLongitude();
                         }
                     }
-
                 }
                 if (this.isNetworkEnabled) {
                     if (this.location == null) {

@@ -52,7 +52,7 @@ public class DatabaseAdapter {
     public List getAllCategories() throws SQLException{
         this.isOpen();
         //Cursor c = database.query(true, TABLE_CATEGORIES, columnsCategories, C_COLUMNA_ID + "=" + id, null, null, null, null, null);
-        Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, null, null, null, null, null, null);
+        Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, null, null, null, null, COLUMN_NAME + " ASC", null);
         List<Category> categories = new ArrayList<Category>();
         if (cursor.moveToFirst()) {
             do {
@@ -171,6 +171,11 @@ public class DatabaseAdapter {
     public long deletePhrase(String phrase) throws SQLException {
         this.isOpen();
         return database.delete(TABLE_PHRASES, COLUMN_PHRASE + " = '" + phrase + "'", null);
+    }
+
+    public long deleteCategory(String category) throws SQLException {
+        this.isOpen();
+        return database.delete(TABLE_CATEGORIES, COLUMN_NAME + " = '" + category + "'", null);
     }
 
     public long updatePhrase(String oldPhrase, String updatedPhrase, Category category) throws SQLException {

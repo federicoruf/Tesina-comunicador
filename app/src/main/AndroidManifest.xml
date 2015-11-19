@@ -10,7 +10,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/BlueWhiteActionBarTheme" >
-
         <meta-data
             android:name="sordos"
             android:value="AIzaSyAQcafXWJo0QxU46U16EbmWSogIYklYbRc" />
@@ -18,12 +17,12 @@
         <activity
             android:name="com.example.federico.activities.ListPhrasesActivity"
             android:label="@string/title_activity_list_phrases"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.federico.activities.StartActivity"
             android:label="@string/title_activity_start"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,12 +32,16 @@
         <activity
             android:name="com.example.federico.activities.CreateCategoryActivity"
             android:label="@string/title_activity_create_category"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.federico.activities.ChatActivity"
             android:label="@string/title_activity_chat"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.example.federico.activities.ListCategoriesActivity"
+            android:label="@string/title_activity_list_categories" >
         </activity>
     </application>
 

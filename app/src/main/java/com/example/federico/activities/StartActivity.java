@@ -34,7 +34,6 @@ import com.example.federico.background.GooglePlacesRequest;
 import com.example.federico.objects.Place;
 import com.example.federico.objects.PlacesList;
 
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -59,6 +58,7 @@ public class StartActivity extends Activity{
     private TextView textViewResultsSearch;
     private EditText inputSearchPlace;
     private Button buttonChatNow;
+    //es para modificar el estado  en el menu según si el gps esta activado o no
     private Menu menu;
 
     private StartActivity context;
@@ -113,7 +113,7 @@ public class StartActivity extends Activity{
         this.buttonChatNow.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startMainActivity("default");
+                startChatActivity("default");
             }
         });
     }
@@ -133,19 +133,18 @@ public class StartActivity extends Activity{
                 + "&rankby=distance"
                 + "&key=" + API_KEY;
         System.out.println(TempSQL);
-        googlePlacesRequest = new GooglePlacesRequest();
-        AsyncTask<String, Void, String> execute1 = googlePlacesRequest.execute(TempSQL);
-        //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
-
         try {
-            googlePlacesRequest.get();
-            placesList = googlePlacesRequest.getPlacesList();
+            this.googlePlacesRequest = new GooglePlacesRequest();
+            this.googlePlacesRequest.execute(TempSQL);
+            //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
+            this.googlePlacesRequest.get();
+            this.placesList = this.googlePlacesRequest.getPlacesList();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        textViewResultsSearch.setText("Resultados de la busqueda: " + placesList.getResults().size());
+        this.textViewResultsSearch.setText("Resultados de la busqueda: " + this.placesList.getResults().size());
         createListByPlacesNames();
     }
 
@@ -157,7 +156,7 @@ public class StartActivity extends Activity{
 
     private void setButtonSearchPlaceName() {
         this.buttonSearchPlaceName = (Button) findViewById(R.id.buttonSearchPlaceName);
-        buttonSearchPlaceName.setOnClickListener(new OnClickListener() {
+        this.buttonSearchPlaceName.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 //PREGUNTAR SI ESTA HABILITADO EL GPS, PARA ASÍ BUSCA POR LUGAR
@@ -208,17 +207,22 @@ public class StartActivity extends Activity{
             if (this.tracker.isCanGetLocation()) {
                 try {
                     System.out.println("lat: " + this.tracker.getLatitude() + "long: " + this.tracker.getLongitude());
-                    String concatTypes = concatTypes((ArrayList<Category>) dbAdapter.getAllCategories());
+                    String concatTypes = concatTypes((ArrayList<Category>) this.dbAdapter.getAllCategories());
                     setResultSearchWithGPSByCategory(concatTypes);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             } else {
-               this.emptyResultSearch();
+               //this.emptyResultSearch();
+                try {
+                    ArrayList<Category> categories = dbAdapter.getAllCategoriesThatMatchWith("");
+                    this.loadCategoriesInrResultList(categories);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             this.setActionBarGpsStatus();
         }
-
     }
 
     private void emptyResultSearch() {
@@ -228,7 +232,7 @@ public class StartActivity extends Activity{
 
     private void setButtonSearchCategory() {
         this.buttonSearchCategory = (Button) findViewById(R.id.buttonSearchPlace);
-        buttonSearchCategory.setOnClickListener(new OnClickListener() {
+        this.buttonSearchCategory.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 //toma el valor ingresado en el input
@@ -248,7 +252,8 @@ public class StartActivity extends Activity{
                             placeToSearch = concatTypes(categories);
                             setResultSearchWithGPSByCategory(placeToSearch);
                         } else {
-                            ArrayList<String> catNames = new ArrayList<String>();
+                            loadCategoriesInrResultList(categories);
+                            /*ArrayList<String> catNames = new ArrayList<String>();
                             for (Category c : categories) {
                                 catNames.add(c.getName());
                             }
@@ -259,9 +264,9 @@ public class StartActivity extends Activity{
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                     String item = parent.getAdapter().getItem(position).toString();
-                                    startMainActivity(item);
+                                    startChatActivity(item);
                                 }
-                            });
+                            });*/
                         }
                     } else {
                         emptyResultSearch();
@@ -273,21 +278,37 @@ public class StartActivity extends Activity{
         });
     }
 
-    //genera la vista de los resultado del tipo "nombre del lugar"
-    private void createListByPlacesNames(){
-        ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getPlacesName());
+    private void loadCategoriesInrResultList(ArrayList<Category> categories){
+        ArrayList<String> catNames = new ArrayList<String>();
+        for (Category c : categories) {
+            catNames.add(c.getName());
+        }
+        textViewResultsSearch.setText("Resultados de la busqueda: " + catNames.size());
+        ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, catNames);
         listView.setAdapter(adapter);
-        //listener para los elementos encontrados
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getAdapter().getItem(position).toString();
-                //obtiene de la lista de lugares el que fue seleccionado
-                Place place = placesList.getPlace(item);
+                startChatActivity(item);
+            }
+        });
+    }
+
+    //genera la vista de los resultado del tipo "nombre del lugar"
+    private void createListByPlacesNames(){
+        ArrayAdapter adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getPlacesName());
+        this.listView.setAdapter(adapter);
+        //listener para los elementos encontrados
+        this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getAdapter().getItem(position).toString();
                 try {
+                    //obtiene de la lista de lugares el que fue seleccionado
                     //obtiene el objeto category correspondiente a uno de los tipos del place
-                    Category cat = dbAdapter.getCategoryLikeFromPlace(place);
-                    startMainActivity(cat.getName());
+                    Category cat = dbAdapter.getCategoryLikeFromPlace(placesList.getPlace(item));
+                    startChatActivity(cat.getName());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -306,7 +327,7 @@ public class StartActivity extends Activity{
         return placeToSearch;
     }
 
-    private void startMainActivity(String category){
+    private void startChatActivity(String category){
         Intent intent = new Intent(getBaseContext(), ChatActivity.class);
         intent.putExtra("categorySpanish", category);
         startActivity(intent);
@@ -341,13 +362,13 @@ public class StartActivity extends Activity{
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will automatically handle clicks on
         // the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         switch (item.getItemId()) {
             case R.id.action_download:
                 System.out.println("clickeoooo");
                 return true;
             case R.id.action_activate_GPS:
                 int i = 0;
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 context.startActivityForResult(intent, i);
                 context.onActivityResult(i, 0, intent);
                 return true;
@@ -355,21 +376,12 @@ public class StartActivity extends Activity{
                 intent = new Intent(getBaseContext(), CreateCategoryActivity.class);
                 context.startActivity(intent);
                 return true;
+            case R.id.action_list_categories:
+                intent =  new Intent(getBaseContext(), ListCategoriesActivity.class);
+                context.startActivity(intent);
+                return true;
         }
-
-
         return super.onOptionsItemSelected(item);
-    }
-
-    /*Creates a dialog for an error message*/
-    private void showErrorDialog(int errorCode) {
-        // create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        //lo configura como un dialog, pero usa un metodo desconocido "getSupportFragmentManager()"
-        Toast.makeText(StartActivity.this, args.getString("DIALOG_ERROR"), Toast.LENGTH_LONG).show();
     }
 
     /*called from ErrorDialogFragment when the dialog is dismissed*/

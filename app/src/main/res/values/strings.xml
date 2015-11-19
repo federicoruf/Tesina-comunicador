@@ -3,7 +3,7 @@
 
     <string name="ListaFrases">Lista de frases</string>
     <string name="title_activity_talk">Talk</string>
-    <string name="title_activity_list_phrases">ListPhrasesActivity</string>
+    <string name="title_activity_list_phrases">Lista de frases</string>
     <string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>
 
     <string name="title_activity_main2">Main2Activity</string>
@@ -12,7 +12,7 @@
 
     <!--START ACTIVITY-->
     <string name="searchResutls">Resultados de la busqueda</string>
-    <string name="title_activity_start">StartActivity</string>
+    <string name="title_activity_start">Principal</string>
     <string name="buscar_lugar">Buscar por categoría</string>
 
     <!--CHAT ACTIVITY-->
@@ -27,7 +27,7 @@
     <string name="inputSelectPhrase">Ingrese o seleccione su frase</string>
     <string name="listenerPerson">Oyente</string>
     <string name="speak_button">Hablar</string>
-    <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_chat">Chat</string>
 
     <!--LIST PHRASES ACTIVITY-->
     <string name="phrase_updated">Frase actualizada</string>
@@ -37,6 +37,7 @@
     <string name="menu_delete">Eliminar</string>
     <string name="delete_title">Eliminar</string>
     <string name="delete_message">¿Seguro que quiere eliminar la frase?</string>
+    <string name="delete_message_category">¿Seguro que quiere eliminar la categoría?</string>
     <string name="phrase_deleted">Frase eliminada</string>
     <string name="input_phrase_edit">Ingrese la frase:</string>
     <string name="buscar_lugar_por_nombre">Buscar lugar</string>
@@ -46,16 +47,26 @@
     <!--ACTION VAR-->
     <string name="action_settings">settings</string>
     <string name="action_download">Descargar conversación</string>
-    <string name="opciones">opciones</string>
     <string name="activate_GPS">Activar GPS</string>
     <string name="deactivate_GPS">Desactivar GPS</string>
     <string name="create_category">Crear categoría</string>
+    <string name="my_categories">Mis categorías</string>
+    <string name="title_activity_list_categories">Mis categorías</string>
+    <string name="start_activity">Principal</string>
+
 
     <!--CREATE CATEGORY ACTIVITY-->
-    <string name="title_activity_create_category">CreateCategoryActivity</string>
+    <string name="title_activity_create_category">Crear una categoria</string>
     <string name="category_name">Nombre de la cateogoría</string>
     <string name="new_phrase_input">Nueva frase</string>
     <string name="add_new_phrase">Agregar frase</string>
     <string name="button_add_category">Agregar categoría</string>
     <string name="category_added">Se agrego exitosamente la categoría</string>
+    <string name="new_phrases_category">Frases de la nueva categoría</string>
+    <string name="new_phrase_name_exist">La categoría que intenta dar de alta ya existe</string>
+
+    <!--LIST CATEGORIES-->
+    <string name="category_deleted">Categoría eliminada</string>
+    <string name="text_my_categories">Mis categorías</string>
+    <string name="chat_title">Categoría:</string>
 </resources>

@@ -45,15 +45,15 @@ public class ListPhrasesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_phrases);
         this.context = ListPhrasesActivity.this;
-        this.dbAdapter = new DatabaseAdapter(context);
+        this.dbAdapter = new DatabaseAdapter(this.context);
 
         String categoryName = getIntent().getStringExtra("categorySpanish");
         try {
-            this.category = dbAdapter.getCategoryFromSpanishName(categoryName);
+            this.category = this.dbAdapter.getCategoryFromSpanishName(categoryName);
             //this.category = ProvisionalContainer.getPhrasesFrom(place);
-            if (category != null) {
+            if (this.category != null) {
                 this.textViewFracesCategoria = (TextView) findViewById(R.id.textViewCategoryPhrases);
-                textViewFracesCategoria.setText("Frases de la categoría: " + category.getName());
+                this.textViewFracesCategoria.setText("Frases de la categoría: " + this.category.getName());
 
                 //setea la lista de frases
                 this.setListView();
@@ -85,6 +85,7 @@ public class ListPhrasesActivity extends Activity {
         this.listAdapter = new ArrayAdapter<String>(this, R.layout.activity_list_view_phrases, phrasesFromCategory);
         this.listView.setAdapter(this.listAdapter);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -94,16 +95,10 @@ public class ListPhrasesActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

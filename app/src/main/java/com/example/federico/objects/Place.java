@@ -1,9 +1,10 @@
 package com.example.federico.objects;
 
-import com.google.api.client.util.Key;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+
+//lugares devueltos por la API Google Places
 public class Place {
 
     private String id;

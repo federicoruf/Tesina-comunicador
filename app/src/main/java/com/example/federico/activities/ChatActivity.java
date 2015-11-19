@@ -1,5 +1,6 @@
 package com.example.federico.activities;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -51,9 +52,8 @@ public class ChatActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         this.context = ChatActivity.this;
-        this.dbAdapter = new DatabaseAdapter(context);
-        Intent intent = getIntent();
-        this.categorySpanish = intent.getStringExtra("categorySpanish");
+        this.dbAdapter = new DatabaseAdapter(this.context);
+        this.categorySpanish = getIntent().getStringExtra("categorySpanish");
 
         //this.textViewChat = (TextView) findViewById(R.id.textOutput);
 
@@ -86,6 +86,15 @@ public class ChatActivity extends Activity {
         this.chatHistory = new ArrayList<ChatMessage>();
         this.adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         this.messagesContainer.setAdapter(this.adapter);
+
+        //si la versión de android es mayor a la 11, entonces se muestra el nombre de la categoría.
+        ActionBar ab = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            ab = getActionBar();
+            if (!this.categorySpanish.equals("default")) {
+                ab.setSubtitle(getResources().getString(R.string.chat_title) + " " + this.categorySpanish);
+            }
+        }
     }
 
     private void setImgButtonSpeech() {
@@ -151,8 +160,7 @@ public class ChatActivity extends Activity {
             @Override
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR) {
-                    Locale locSpanish = new Locale("spa", "ARG");
-                    textToSpeech.setLanguage(locSpanish);
+                    textToSpeech.setLanguage(new Locale("spa", "ARG"));
                 }
             }
         });
@@ -187,9 +195,7 @@ public class ChatActivity extends Activity {
     }
 
     private void createChatMessage(boolean itsMe, String messageText) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setMessage(messageText);
-        chatMessage.setMe(itsMe);
+        ChatMessage chatMessage = new ChatMessage(itsMe, messageText);
         displayMessage(chatMessage);
     }
 
@@ -246,8 +252,7 @@ public class ChatActivity extends Activity {
         //for the phrase selected by the user
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
-                String val = data.getStringExtra("Phrase");
-                this.editPhrase.setText(val);
+                this.editPhrase.setText(data.getStringExtra("Phrase"));
             }
         }
     }

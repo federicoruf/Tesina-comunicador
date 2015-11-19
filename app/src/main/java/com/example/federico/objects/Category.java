@@ -1,16 +1,9 @@
 package com.example.federico.objects;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 
 import com.example.federico.sqlite.DatabaseAdapter;
-
-import java.util.ArrayList;
-
-/**
- * Created by federico on 07/10/2015.
- */
 
 public class Category {
 

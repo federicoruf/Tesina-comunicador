@@ -1,25 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.federico.activities.StartActivity">
+    tools:context="com.example.federico.activities.ListCategoriesActivity">
     <item
         android:id="@+id/action_download"
         android:title="@string/action_download"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_activate_GPS"
-        android:title="@string/activate_GPS"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_create_category"
-        android:title="@string/create_category"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_list_categories"
         android:title="@string/my_categories"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_start"
+        android:title="@string/start_activity"
         android:orderInCategory="100"
         app:showAsAction="never" />
 </menu>

@@ -8,6 +8,11 @@ public class ChatMessage {
     private boolean isMe;
     private String message;
 
+    public ChatMessage(boolean isMe, String message) {
+        this.isMe = isMe;
+        this.message = message;
+    }
+
     public boolean getIsme() {
         return isMe;
     }
