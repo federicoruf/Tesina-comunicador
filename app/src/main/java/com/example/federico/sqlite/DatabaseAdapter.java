@@ -152,7 +152,7 @@ public class DatabaseAdapter {
         this.isOpen();
         ArrayList<String> phrasesFounded = new ArrayList<String>();
         String categoryIdFilter = COLUMN_CATEGORY_ID + " = " + id;
-        Cursor cursor = database.query(true, TABLE_PHRASES, columnsPhrases, categoryIdFilter, null, null, null, null, null);
+        Cursor cursor = database.query(true, TABLE_PHRASES, columnsPhrases, categoryIdFilter, null, null, null, COLUMN_PHRASE + " ASC", null);
         if (cursor != null) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {

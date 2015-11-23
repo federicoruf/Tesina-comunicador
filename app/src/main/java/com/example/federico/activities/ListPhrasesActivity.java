@@ -1,5 +1,6 @@
 package com.example.federico.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -50,14 +51,16 @@ public class ListPhrasesActivity extends Activity {
         String categoryName = getIntent().getStringExtra("categorySpanish");
         try {
             this.category = this.dbAdapter.getCategoryFromSpanishName(categoryName);
-            //this.category = ProvisionalContainer.getPhrasesFrom(place);
-            if (this.category != null) {
-                this.textViewFracesCategoria = (TextView) findViewById(R.id.textViewCategoryPhrases);
-                this.textViewFracesCategoria.setText("Frases de la categoría: " + this.category.getName());
-
-                //setea la lista de frases
-                this.setListView();
+            //si la versión de android es mayor a la 11, entonces se muestra el nombre de la categoría.
+            ActionBar ab = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                ab = getActionBar();
+                if (!this.category.equals("default")) {
+                    ab.setSubtitle(getResources().getString(R.string.chat_title) + " " + this.category.getName());
+                }
             }
+            //setea la lista de frases
+            this.setListView();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -85,7 +88,7 @@ public class ListPhrasesActivity extends Activity {
         this.listAdapter = new ArrayAdapter<String>(this, R.layout.activity_list_view_phrases, phrasesFromCategory);
         this.listView.setAdapter(this.listAdapter);
     }
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -100,7 +103,7 @@ public class ListPhrasesActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
