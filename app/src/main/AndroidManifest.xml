@@ -40,8 +40,8 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.example.federico.activities.ListCategoriesActivity"
-            android:label="@string/title_activity_list_categories" >
+            android:name="com.example.federico.activities.TabsCategoriesActivity"
+            android:label="@string/title_activity_download_category" >
         </activity>
     </application>
 

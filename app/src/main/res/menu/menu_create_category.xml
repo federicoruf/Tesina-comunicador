@@ -9,11 +9,6 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_list_categories"
-        android:title="@string/my_categories"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_start"
         android:title="@string/start_activity"
         android:orderInCategory="100"

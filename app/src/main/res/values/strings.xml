@@ -7,7 +7,7 @@
     <string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>
 
     <string name="title_activity_main2">Main2Activity</string>
-    <string name="button_Download">Desargar conversación</string>
+    <string name="button_Download">Descargar conversación</string>
     <string name="category_phrases">Frases de categoría:</string>
 
     <!--START ACTIVITY-->
@@ -38,15 +38,15 @@
     <string name="delete_title">Eliminar</string>
     <string name="delete_message">¿Seguro que quiere eliminar la frase?</string>
     <string name="delete_message_category">¿Seguro que quiere eliminar la categoría?</string>
+    <string name="download_message_category">¿Quiere descargar esta categoría?</string>
     <string name="phrase_deleted">Frase eliminada</string>
     <string name="input_phrase_edit">Ingrese la frase:</string>
     <string name="buscar_lugar_por_nombre">Buscar lugar</string>
-
-
     <string name="button_chat_now">Hablar ahora</string>
+
     <!--ACTION VAR-->
     <string name="action_settings">settings</string>
-    <string name="action_download">Descargar conversación</string>
+    <string name="action_download">Categorías</string>
     <string name="activate_GPS">Activar GPS</string>
     <string name="deactivate_GPS">Desactivar GPS</string>
     <string name="create_category">Crear categoría</string>
@@ -65,8 +65,12 @@
     <string name="new_phrases_category">Frases de la nueva categoría</string>
     <string name="new_phrase_name_exist">La categoría que intenta dar de alta ya existe</string>
 
-    <!--LIST CATEGORIES-->
+    <!--LIST CATEGORIES--><!--DOWNLOAD CATEGORY ACTIVITY-->
     <string name="category_deleted">Categoría eliminada</string>
+    <string name="category_downloaded">Categoría descargada</string>
     <string name="text_my_categories">Mis categorías</string>
     <string name="chat_title">Categoría:</string>
+    <string name="download_title">Para descargar</string>
+    <string name="title_activity_download_category">Categorías</string>
+    <string name="text_view_packages">Paquetes disponibles</string>
 </resources>

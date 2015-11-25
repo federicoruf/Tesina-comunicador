@@ -365,7 +365,8 @@ public class StartActivity extends Activity{
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         switch (item.getItemId()) {
             case R.id.action_download:
-                System.out.println("clickeoooo");
+                intent =  new Intent(getBaseContext(), TabsCategoriesActivity.class);
+                context.startActivity(intent);
                 return true;
             case R.id.action_activate_GPS:
                 int i = 0;
@@ -374,10 +375,6 @@ public class StartActivity extends Activity{
                 return true;
             case R.id.action_create_category:
                 intent = new Intent(getBaseContext(), CreateCategoryActivity.class);
-                context.startActivity(intent);
-                return true;
-            case R.id.action_list_categories:
-                intent =  new Intent(getBaseContext(), ListCategoriesActivity.class);
                 context.startActivity(intent);
                 return true;
         }

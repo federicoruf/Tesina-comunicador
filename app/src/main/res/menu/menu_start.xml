@@ -17,9 +17,4 @@
         android:title="@string/create_category"
         android:orderInCategory="100"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_list_categories"
-        android:title="@string/my_categories"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
 </menu>

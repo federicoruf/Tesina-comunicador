@@ -136,6 +136,7 @@ public class CreateCategoryActivity extends Activity {
         return this.listPhrases.contains(newPhrase);
     }
 
+    //esto muestra las 2 opciones, crea el estilo del menu
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -144,6 +145,7 @@ public class CreateCategoryActivity extends Activity {
         menu.add(Menu.NONE, C_DELETE, Menu.NONE, R.string.menu_delete);
     }
 
+    //se ejecuta cuando el usuario selecciona una de las 2 opciones
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
@@ -189,7 +191,6 @@ public class CreateCategoryActivity extends Activity {
         //SETEAR LOS DATOS EN EL INPUT!!!!
         String oldPhrase = listAdapter.getItem((int)id).toString();
         userInput.setText(oldPhrase);
-        System.out.println("vieja frase: " + oldPhrase);
         alertDialogBuilder
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -242,10 +243,7 @@ public class CreateCategoryActivity extends Activity {
 
         switch (item.getItemId()) {
             case R.id.action_download:
-                System.out.println("clickeoooo");
-                return true;
-            case R.id.action_list_categories:
-                Intent intent = new Intent(getBaseContext(), ListCategoriesActivity.class);
+                Intent intent =  new Intent(getBaseContext(), TabsCategoriesActivity.class);
                 context.startActivity(intent);
                 return true;
             case R.id.action_start:
