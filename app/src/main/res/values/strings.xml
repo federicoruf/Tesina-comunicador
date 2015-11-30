@@ -4,30 +4,32 @@
     <string name="ListaFrases">Lista de frases</string>
     <string name="title_activity_talk">Talk</string>
     <string name="title_activity_list_phrases">Lista de frases</string>
-    <string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>
+    <!--<string name="title_activity_activity_list_view_phrases">activity_listView_phrases</string>-->
 
-    <string name="title_activity_main2">Main2Activity</string>
-    <string name="button_Download">Descargar conversación</string>
+    <!--<string name="title_activity_main2">Main2Activity</string>-->
+    <!--<string name="button_Download">Descargar conversación</string>-->
     <string name="category_phrases">Frases de categoría:</string>
 
     <!--START ACTIVITY-->
-    <string name="searchResutls">Resultados de la busqueda</string>
+    <string name="search_results">Resultados de la búsqueda</string>
     <string name="title_activity_start">Principal</string>
-    <string name="buscar_lugar">Buscar por categoría</string>
+    <string name="search_by_place">Buscar por categoría</string>
+    <string name="search_place_by_name">Buscar lugar</string>
+    <string name="button_chat_now">Hablar ahora</string>
 
     <!--CHAT ACTIVITY-->
     <string name="new_phrase">Se agrego con exito una nueva frase</string>
     <string name="no_voice_recognition">No se encuentra disponible la herramienta voice recognizer</string>
     <string name="phrase_repeated">La frase ya existe</string>
     <string name="button_speak">Hablar</string>
-    <string name="microphono">Micrófono</string>
+    <string name="microphono">Escuchar</string>
     <string name="choose_phrase">Elegir frase</string>
     <string name="other_talk">Oyente</string>
     <string name="myself">Yo</string>
-    <string name="inputSelectPhrase">Ingrese o seleccione su frase</string>
-    <string name="listenerPerson">Oyente</string>
+    <string name="input_select_phrase">Ingrese o seleccione su frase</string>
     <string name="speak_button">Hablar</string>
     <string name="title_activity_chat">Chat</string>
+    <string name="add_phrase">Agregar frase</string>
 
     <!--LIST PHRASES ACTIVITY-->
     <string name="phrase_updated">Frase actualizada</string>
@@ -41,8 +43,6 @@
     <string name="download_message_category">¿Quiere descargar esta categoría?</string>
     <string name="phrase_deleted">Frase eliminada</string>
     <string name="input_phrase_edit">Ingrese la frase:</string>
-    <string name="buscar_lugar_por_nombre">Buscar lugar</string>
-    <string name="button_chat_now">Hablar ahora</string>
 
     <!--ACTION VAR-->
     <string name="action_settings">settings</string>

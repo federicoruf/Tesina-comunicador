@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autoText="true"
-            android:hint="@string/inputSelectPhrase"
+            android:hint="@string/input_select_phrase"
             android:layout_above="@+id/buttonSpeak"
             android:layout_toLeftOf="@+id/imageButtonPlus" />
 
@@ -47,7 +47,8 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/messagesContainer"
             android:layout_alignLeft="@+id/imageButtonMicrophone"
-            android:layout_alignStart="@+id/imageButtonMicrophone" />
+            android:layout_alignStart="@+id/imageButtonMicrophone"
+            android:contentDescription="@string/add_phrase"/>
 
         <ImageButton
             android:id="@+id/imageButtonMicrophone"
