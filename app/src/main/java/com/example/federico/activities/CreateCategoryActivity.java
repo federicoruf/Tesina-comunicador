@@ -112,12 +112,18 @@ public class CreateCategoryActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String newPhrase = inputNewPhrase.getText().toString();
-                if (!containsPhrase(newPhrase)) {
-                    listPhrases.add(newPhrase);
-                    listAdapter.notifyDataSetChanged();
-                    closeKeyboard();
+                System.out.println("newPhrase " + newPhrase.isEmpty());
+                inputNewPhrase.getText().clear();
+                if (!newPhrase.equals("") || !newPhrase.isEmpty()) {
+                    if (!containsPhrase(newPhrase)) {
+                        listPhrases.add(newPhrase);
+                        listAdapter.notifyDataSetChanged();
+                        closeKeyboard();
+                    } else {
+                        showToastMessage(getResources().getString(R.string.phrase_repeated));
+                    }
                 } else {
-                    showToastMessage(getResources().getString(R.string.phrase_repeated));
+                    showToastMessage(getResources().getString(R.string.phrase_empty));
                 }
             }
         });

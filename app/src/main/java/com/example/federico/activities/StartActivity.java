@@ -2,16 +2,24 @@ package com.example.federico.activities;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v7.internal.view.menu.MenuBuilder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,15 +73,67 @@ public class StartActivity extends Activity{
     private GPSTraker tracker;
     private PlacesList placesList;
     private DatabaseAdapter dbAdapter;
+    private boolean wifiActive;
 
     private GooglePlacesRequest googlePlacesRequest;
+
+    private void activateInternerConnection() {
+        String[] options = new String[] {getResources().getString(R.string.activate_wifi)
+                , getResources().getString(R.string.activate_movile_network)};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.network_option_select));
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //valor de retorno para cuando finaliza el intent y vuelve a la app original, que es lo q debe hacer?
+                //onactivityresult creo q se llama el método
+                int i = 1;
+                switch (which) {
+                    case 0:
+                        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                        context.startActivityForResult(intent, i);
+                        context.onActivityResult(i, 2, intent);
+                        if (getParent() == null) {
+                            setResult(Activity.RESULT_OK);
+                        } else {
+                            getParent().setResult(Activity.RESULT_OK);
+                        }
+                        break;
+                    case 1:
+                        intent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
+                        context.startActivityForResult(intent, i);
+                        context.onActivityResult(i, 2, intent);
+                        break;
+                }
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    private void isWifiActive(){
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        this.wifiActive = mWifi.isConnected();
+    }
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
         this.context = StartActivity.this;
         this.tracker = new GPSTraker(this.context);
+        this.isWifiActive();
+        if (!this.wifiActive) {
+            System.out.println("wifi descativado!!");
+            this.activateInternerConnection();
+        } else {
+            this.startApplicationElements();
+        }
+    }
+
+    private void startApplicationElements(){
+        setContentView(R.layout.activity_start);
 
         this.placesList = new PlacesList();
 
@@ -104,7 +164,8 @@ public class StartActivity extends Activity{
         this.setButtonChatNow();
 
         //chequea si esta halitado el gps y actualiza el cehckbox según como este.
-        LocationManager mlocManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);;
+        LocationManager mlocManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
         boolean enabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
@@ -163,8 +224,7 @@ public class StartActivity extends Activity{
                 //ES NECESARIO CONOCER SU UBICACIÓN PARA OBTENER LOS NOMBRE DE LUGARES CERCA DE DONDE SE ENCUENTRA, DESEA HABILITAR EL GPS?
                 if (tracker.getLocation() != null) {
                     //toma el valor ingresado en el input
-                    String placeToSearch = String.valueOf(inputSearchPlace.getText());
-
+                    String placeToSearch = deleteWhiteSpace(String.valueOf(inputSearchPlace.getText()));
                     closeKeyboard();
                     try {
                         String TempSQL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
@@ -204,24 +264,32 @@ public class StartActivity extends Activity{
             //reinicia el tracker para que tome la ubicación correctamente
             this.tracker = new GPSTraker(this.context);
             System.out.println("enabled: " + this.tracker.isCanGetLocation());
-            if (this.tracker.isCanGetLocation()) {
-                try {
-                    System.out.println("lat: " + this.tracker.getLatitude() + "long: " + this.tracker.getLongitude());
-                    String concatTypes = concatTypes((ArrayList<Category>) this.dbAdapter.getAllCategories());
-                    setResultSearchWithGPSByCategory(concatTypes);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            //si es null es xq entro devido a q no hay señal de internet
+            if (this.dbAdapter != null) {
+                if (this.tracker.isCanGetLocation()) {
+                      try {
+                        System.out.println("lat: " + this.tracker.getLatitude() + "long: " + this.tracker.getLongitude());
+                        String concatTypes = concatTypes((ArrayList<Category>) this.dbAdapter.getAllCategories());
+                        setResultSearchWithGPSByCategory(concatTypes);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                   this.emptyResultSearch();
+                    try {
+                        ArrayList<Category> categories = dbAdapter.getAllCategoriesThatMatchWith("");
+                        this.loadCategoriesInrResultList(categories);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
+                this.setActionBarGpsStatus();
             } else {
-               //this.emptyResultSearch();
-                try {
-                    ArrayList<Category> categories = dbAdapter.getAllCategoriesThatMatchWith("");
-                    this.loadCategoriesInrResultList(categories);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                this.startApplicationElements();
+                this.isWifiActive();
+                MenuBuilder builder = new MenuBuilder(this);
+                this.onCreateOptionsMenu(builder);
             }
-            this.setActionBarGpsStatus();
         }
     }
 
@@ -230,13 +298,23 @@ public class StartActivity extends Activity{
         this.listView.setAdapter(null);
     }
 
+    public String deleteWhiteSpace(String placeToSearch){
+
+            if (placeToSearch.length() != 0 && Character.isWhitespace(placeToSearch.charAt(placeToSearch.length() - 1))) {
+                System.out.println("tiene espacio en blanco");
+                return placeToSearch.trim();
+            }
+
+        return placeToSearch;
+    }
+
     private void setButtonSearchCategory() {
         this.buttonSearchCategory = (Button) findViewById(R.id.buttonSearchPlace);
         this.buttonSearchCategory.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 //toma el valor ingresado en el input
-                String placeToSearch = String.valueOf(inputSearchPlace.getText());
+                String placeToSearch = deleteWhiteSpace(String.valueOf(inputSearchPlace.getText()));
                 //ArrayList<Category> categories = ProvisionalContainer.businessEnglishNames(placeToSearch);
                 ArrayList<Category> categories = null;
                 try {
@@ -352,24 +430,28 @@ public class StartActivity extends Activity{
     //setea el menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
-        getMenuInflater().inflate(R.menu.menu_start, menu);
-        this.setActionBarGpsStatus();
-        return true;
+        System.out.println("SETEA EL MENU");
+        //if (wifiActive) {
+            this.menu = menu;
+            getMenuInflater().inflate(R.menu.menu_start, menu);
+            this.setActionBarGpsStatus();
+            return true;
+        //}
+       // return false;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will automatically handle clicks on
         // the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
-        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         switch (item.getItemId()) {
             case R.id.action_download:
-                intent =  new Intent(getBaseContext(), TabsCategoriesActivity.class);
+                Intent intent =  new Intent(getBaseContext(), TabsCategoriesActivity.class);
                 context.startActivity(intent);
                 return true;
             case R.id.action_activate_GPS:
                 int i = 0;
+                intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 context.startActivityForResult(intent, i);
                 context.onActivityResult(i, 0, intent);
                 return true;

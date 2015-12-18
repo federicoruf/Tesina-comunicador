@@ -51,8 +51,10 @@ public class DatabaseAdapter {
 
     public List getAllCategories() throws SQLException{
         this.isOpen();
-        //Cursor c = database.query(true, TABLE_CATEGORIES, columnsCategories, C_COLUMNA_ID + "=" + id, null, null, null, null, null);
-        Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, null, null, null, null, COLUMN_NAME + " ASC", null);
+        //Cursor c = database.query(true, TABLE_CATEGORIES, columnsCategories, C_COLUMNA_ID + "=" + id, null,
+        // null, null, null, null);
+        Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, null, null, null, null,
+                COLUMN_NAME + " ASC", null);
         List<Category> categories = new ArrayList<Category>();
         if (cursor.moveToFirst()) {
             do {
@@ -152,7 +154,8 @@ public class DatabaseAdapter {
         this.isOpen();
         ArrayList<String> phrasesFounded = new ArrayList<String>();
         String categoryIdFilter = COLUMN_CATEGORY_ID + " = " + id;
-        Cursor cursor = database.query(true, TABLE_PHRASES, columnsPhrases, categoryIdFilter, null, null, null, COLUMN_PHRASE + " ASC", null);
+        Cursor cursor = database.query(true, TABLE_PHRASES, columnsPhrases, categoryIdFilter, null, null, null,
+                COLUMN_PHRASE + " ASC", null);
         if (cursor != null) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -175,6 +178,9 @@ public class DatabaseAdapter {
 
     public long deleteCategory(String category) throws SQLException {
         this.isOpen();
+        Category categoryFromSpanishName = this.getCategoryFromSpanishName(category);
+        //elimina las frases relacionadas a la categoria
+        database.delete(TABLE_PHRASES, COLUMN_CATEGORY_ID + " = '" + categoryFromSpanishName.getId() + "'", null);
         return database.delete(TABLE_CATEGORIES, COLUMN_NAME + " = '" + category + "'", null);
     }
 

@@ -16,6 +16,9 @@
     <string name="search_by_place">Buscar por categoría</string>
     <string name="search_place_by_name">Buscar lugar</string>
     <string name="button_chat_now">Hablar ahora</string>
+    <string name="network_option_select">Seleccione una opción de conexión</string>
+    <string name="activate_wifi">Activar wifi</string>
+    <string name="activate_movile_network">Activar red movil</string>
 
     <!--CHAT ACTIVITY-->
     <string name="new_phrase">Se agrego con exito una nueva frase</string>
@@ -73,4 +76,5 @@
     <string name="download_title">Para descargar</string>
     <string name="title_activity_download_category">Categorías</string>
     <string name="text_view_packages">Paquetes disponibles</string>
+    <string name="phrase_empty">Por favor ingrese una frase</string>
 </resources>

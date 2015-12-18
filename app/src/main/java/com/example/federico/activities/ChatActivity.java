@@ -189,7 +189,11 @@ public class ChatActivity extends Activity {
                 createChatMessage(true, messageText);
                 editPhrase.setText("");
                 //esta deprecado, pero si agrego un null al final no lo estará, pero esa versión no esta disponible para APIs antiguas
-                textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null, null);
+                if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null, null);
+                } else {
+                    textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null);
+                }
             }
         });
     }
