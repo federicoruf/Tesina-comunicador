@@ -77,10 +77,10 @@ public class MyCategoriesActivity extends ListFragment {
     }
 
     private void loadCategories() throws SQLException {
-        List<Category> categories = this.dbAdapter.getAllCategories();
+        List<Category> categories = this.dbAdapter.getAllRealCategories();
         ArrayList<String> categoriesNames = new ArrayList<String>();
         for(Category c: categories) {
-            categoriesNames.add(c.getName());
+                categoriesNames.add(c.getName());
         }
         this.listAdapter = new ArrayAdapter<String>(this.context, R.layout.activity_list_view_phrases, categoriesNames);
         this.listView.setAdapter(this.listAdapter);
@@ -88,7 +88,6 @@ public class MyCategoriesActivity extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        System.out.println("11111111");
         return inflater.inflate(R.layout.my_categories_layout, container, false);
     }
 

@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class DatabaseAdapter {
 
+    private static final String DEFAULT = "default";
     private Context contexto;
     private DatabaseHelper dbHelper;
     private SQLiteDatabase database;
@@ -49,6 +50,7 @@ public class DatabaseAdapter {
         this.close();
     }
 
+    //este método retorna todas las categorías incluyendo la default
     public List getAllCategories() throws SQLException{
         this.isOpen();
         //Cursor c = database.query(true, TABLE_CATEGORIES, columnsCategories, C_COLUMNA_ID + "=" + id, null,
@@ -90,7 +92,7 @@ public class DatabaseAdapter {
     public Category getCategoryFromSpanishName(String categorySpanish) throws SQLException {
         this.isOpen();
         Category cat = null;
-        String filter = COLUMN_NAME + " = '" + categorySpanish + "'";
+        String filter = COLUMN_NAME + " = '" + categorySpanish + "' AND " + COLUMN_NAME+ " != " + DEFAULT;
         Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, filter, null, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
@@ -104,7 +106,7 @@ public class DatabaseAdapter {
     public ArrayList<Category> getAllCategoriesThatMatchWith(String placeToSearch) throws SQLException {
         this.isOpen();
         ArrayList<Category> categoriesFounded = new ArrayList<Category>();
-        String startWithFilter = COLUMN_NAME + " LIKE '" + placeToSearch + "%'";
+        String startWithFilter = COLUMN_NAME + " LIKE '" + placeToSearch + "%' AND " + COLUMN_NAME+ " != '" + DEFAULT + "'";
         Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, startWithFilter, null, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
@@ -139,7 +141,7 @@ public class DatabaseAdapter {
 
     public boolean existsCategory(String category) throws SQLException {
         this.isOpen();
-        String filter = COLUMN_NAME + " = '" + category + "'";
+        String filter = COLUMN_NAME + " = '" + category + "' AND " + COLUMN_NAME + " != " + DEFAULT;
         Cursor c = database.query(true, TABLE_CATEGORIES, columnsCategories, filter, null, null, null, null, null);
         return (c.getCount()>0);
     }
@@ -194,5 +196,24 @@ public class DatabaseAdapter {
                     COLUMN_CATEGORY_ID + " = '" + category.getId() + "'" , null);
         }
         return -1;
+    }
+
+    public List<Category> getAllRealCategories() throws SQLException {
+        this.isOpen();
+        String categoryIdFilter = COLUMN_NAME+ " != " + DEFAULT;
+        Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, categoryIdFilter, null, null, null,
+                COLUMN_NAME + " ASC", null);
+        List<Category> categories = new ArrayList<Category>();
+        if (cursor.moveToFirst()) {
+            do {
+                Category cat = new Category();
+                cat.setId(cursor.getInt(cursor.getColumnIndex(DatabaseAdapter.COLUMN_ID)));
+                cat.setName(cursor.getString(cursor.getColumnIndex(DatabaseAdapter.COLUMN_NAME)));
+                cat.setEnglishName(cursor.getString(cursor.getColumnIndex(DatabaseAdapter.COLUMN_ENGLISH_NAME)));
+                categories.add(cat);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return categories;
     }
 }

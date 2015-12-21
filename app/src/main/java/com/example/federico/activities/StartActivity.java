@@ -5,21 +5,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.internal.view.menu.MenuBuilder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,7 +36,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 import com.example.federico.objects.Category;
 import com.example.federico.background.GooglePlacesRequest;
-import com.example.federico.objects.Place;
 import com.example.federico.objects.PlacesList;
 
 import java.sql.SQLException;
@@ -73,11 +69,11 @@ public class StartActivity extends Activity{
     private GPSTraker tracker;
     private PlacesList placesList;
     private DatabaseAdapter dbAdapter;
-    private boolean wifiActive;
-
     private GooglePlacesRequest googlePlacesRequest;
 
+
     private void activateInternerConnection() {
+        System.out.println("hace la ventana");
         String[] options = new String[] {getResources().getString(R.string.activate_wifi)
                 , getResources().getString(R.string.activate_movile_network)};
 
@@ -101,7 +97,9 @@ public class StartActivity extends Activity{
                         }
                         break;
                     case 1:
-                        intent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
+                        intent = new Intent();
+                        intent.setComponent(new ComponentName("com.android.settings",
+                                "com.android.settings.Settings$DataUsageSummaryActivity"));
                         context.startActivityForResult(intent, i);
                         context.onActivityResult(i, 2, intent);
                         break;
@@ -112,10 +110,22 @@ public class StartActivity extends Activity{
         builder.show();
     }
 
-    private void isWifiActive(){
+    private boolean isInternetActive(){
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        this.wifiActive = mWifi.isConnected();
+        NetworkInfo mMobileData = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        System.out.println("esta conectado? " + (mWifi.isConnected() | mMobileData.isConnected()));
+        return mWifi.isConnected() | mMobileData.isConnected();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("esta actuvo? " + this.isInternetActive());
+        if (!this.isInternetActive()) {
+            this.activateInternerConnection();
+            System.out.println("STARTTTT");
+        }
     }
 
     @Override
@@ -123,11 +133,12 @@ public class StartActivity extends Activity{
         super.onCreate(savedInstanceState);
         this.context = StartActivity.this;
         this.tracker = new GPSTraker(this.context);
-        this.isWifiActive();
-        if (!this.wifiActive) {
-            System.out.println("wifi descativado!!");
+        System.out.println("init");
+        if (this.isInternetActive()) {
+            /*System.out.println("no esta conectado");
             this.activateInternerConnection();
-        } else {
+        } else {*/
+            System.out.println("inicializa la ventana");
             this.startApplicationElements();
         }
     }
@@ -275,7 +286,7 @@ public class StartActivity extends Activity{
                         e.printStackTrace();
                     }
                 } else {
-                   this.emptyResultSearch();
+                    this.emptyResultSearch();
                     try {
                         ArrayList<Category> categories = dbAdapter.getAllCategoriesThatMatchWith("");
                         this.loadCategoriesInrResultList(categories);
@@ -285,10 +296,15 @@ public class StartActivity extends Activity{
                 }
                 this.setActionBarGpsStatus();
             } else {
-                this.startApplicationElements();
-                this.isWifiActive();
-                MenuBuilder builder = new MenuBuilder(this);
-                this.onCreateOptionsMenu(builder);
+                if (!this.isInternetActive()) {
+                    System.out.println("me pide activar internet");
+                    this.activateInternerConnection();
+                } else {
+                    System.out.println("arranca la app");
+                    this.startApplicationElements();
+                    MenuBuilder builder = new MenuBuilder(this);
+                    this.onCreateOptionsMenu(builder);
+                }
             }
         }
     }
@@ -430,14 +446,10 @@ public class StartActivity extends Activity{
     //setea el menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        System.out.println("SETEA EL MENU");
-        //if (wifiActive) {
-            this.menu = menu;
-            getMenuInflater().inflate(R.menu.menu_start, menu);
-            this.setActionBarGpsStatus();
-            return true;
-        //}
-       // return false;
+        this.menu = menu;
+        getMenuInflater().inflate(R.menu.menu_start, menu);
+        this.setActionBarGpsStatus();
+        return true;
     }
 
     @Override
