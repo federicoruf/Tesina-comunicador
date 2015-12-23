@@ -211,8 +211,10 @@ public class StartActivity extends Activity{
             //esto hace que la app espere a que termine el proceso en background así se carga la variable placesList
             this.googlePlacesRequest.get();
             this.placesList = this.googlePlacesRequest.getPlacesList();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (ExecutionException e1){
+            e1.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -256,7 +258,7 @@ public class StartActivity extends Activity{
                             textViewResultsSearch.setText("Resultados de la busqueda: 0");
                             listView.setAdapter(null);
                         }
-                    } catch (InterruptedException | ExecutionException e) {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();

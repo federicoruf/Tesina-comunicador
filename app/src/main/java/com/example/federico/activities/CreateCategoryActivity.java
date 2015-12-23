@@ -98,8 +98,12 @@ public class CreateCategoryActivity extends Activity {
                     } else {
                         showToastMessage(getResources().getString(R.string.new_phrase_name_exist));
                     }
-                } catch (InterruptedException | ExecutionException | SQLException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (ExecutionException  e1){
+                    e1.printStackTrace();
+                } catch (SQLException  e2){
+                    e2.printStackTrace();
                 }
 
             }

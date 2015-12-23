@@ -46,6 +46,7 @@ public class ChatActivity extends Activity {
     private ChatActivity context;
     private ChatAdapter adapter;
     private ArrayList<ChatMessage> chatHistory;
+    private boolean isSpeechRecognitionAbaliable = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,6 @@ public class ChatActivity extends Activity {
         this.context = ChatActivity.this;
         this.dbAdapter = new DatabaseAdapter(this.context);
         this.categorySpanish = getIntent().getStringExtra("categorySpanish");
-
         //this.textViewChat = (TextView) findViewById(R.id.textOutput);
 
         //reconocedor de voz
@@ -99,36 +99,40 @@ public class ChatActivity extends Activity {
 
     private void setImgButtonSpeech() {
         this.setImgButtonSpeech = (ImageButton) findViewById(R.id.imageButtonMicrophone);
-        this.setImgButtonSpeech.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                // Specify the calling package to identify your application
-                //CON ESTA LINEA PUEDO USAR SIN TENER CONEXIÓN A INTERNET, PERO Q PASA, PRIMERO TIENE Q HABER BAJADO AL CELULAR EL PAQUETE DE ESPAÑOL.
-                //NO FUCIONA, NO ENTIENDO XQ.
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es");
+        if(isSpeechRecognitionAbaliable) {
+            this.setImgButtonSpeech.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                    // Specify the calling package to identify your application
+                    //CON ESTA LINEA PUEDO USAR SIN TENER CONEXIÓN A INTERNET, PERO Q PASA, PRIMERO TIENE Q HABER BAJADO AL CELULAR EL PAQUETE DE ESPAÑOL.
+                    //NO FUCIONA, NO ENTIENDO XQ.
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es");
 
-                intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
-                // Display an hint to the user about what he should say.
-                //intent.putExtra(RecognizerIntent.EXTRA_PROMPT, metTextHint.getText().toString());
-                // Given an hint to the recognizer about what the user is going to say
-                //There are two form of language model available
-                //1.LANGUAGE_MODEL_WEB_SEARCH : For short phrases
-                //2.LANGUAGE_MODEL_FREE_FORM  : If not sure about the words or phrases and its domain.
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-                // If number of Matches is not selected then return show toast message
-                /*if (msTextMatches.getSelectedItemPosition() == AdapterView.INVALID_POSITION) {
-                    Toast.makeText(this, "Please select No. of Matches from spinner", Toast.LENGTH_SHORT).show();
-                    return;
-                }*/
-                //int noOfMatches = Integer.parseInt(msTextMatches.getSelectedItem().toString());
-                // Specify how many results you want to receive. The results will be
-                // sorted where the first result is the one with higher confidence.
-                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
-                //Start the Voice recognizer activity for the result.
-                startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
-            }
-        });
+                    intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
+                    // Display an hint to the user about what he should say.
+                    //intent.putExtra(RecognizerIntent.EXTRA_PROMPT, metTextHint.getText().toString());
+                    // Given an hint to the recognizer about what the user is going to say
+                    //There are two form of language model available
+                    //1.LANGUAGE_MODEL_WEB_SEARCH : For short phrases
+                    //2.LANGUAGE_MODEL_FREE_FORM  : If not sure about the words or phrases and its domain.
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+                    // If number of Matches is not selected then return show toast message
+                    /*if (msTextMatches.getSelectedItemPosition() == AdapterView.INVALID_POSITION) {
+                        Toast.makeText(this, "Please select No. of Matches from spinner", Toast.LENGTH_SHORT).show();
+                        return;
+                    }*/
+                    //int noOfMatches = Integer.parseInt(msTextMatches.getSelectedItem().toString());
+                    // Specify how many results you want to receive. The results will be
+                    // sorted where the first result is the one with higher confidence.
+                    intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+                    //Start the Voice recognizer activity for the result.
+                    startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+                }
+            });
+        } else {
+            this.setImgButtonSpeech.setEnabled(false);
+        }
     }
 
     private void setImageButton() {
@@ -219,7 +223,8 @@ public class ChatActivity extends Activity {
         PackageManager pm = getPackageManager();
         List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         if (activities.size() == 0) {
-            this.setImgButtonSpeech.setEnabled(false);
+            this.isSpeechRecognitionAbaliable = false;
+            //this.setImgButtonSpeech.setEnabled(false);
             this.showToastMessage(getResources().getString(R.string.no_voice_recognition));
         }
     }
