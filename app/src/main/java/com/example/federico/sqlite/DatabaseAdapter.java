@@ -92,7 +92,7 @@ public class DatabaseAdapter {
     public Category getCategoryFromSpanishName(String categorySpanish) throws SQLException {
         this.isOpen();
         Category cat = null;
-        String filter = COLUMN_NAME + " = '" + categorySpanish + "' AND " + COLUMN_NAME+ " != " + DEFAULT;
+        String filter = COLUMN_NAME + " = '" + categorySpanish + "' AND " + COLUMN_NAME+ " != '" + DEFAULT + "'";
         Cursor cursor = database.query(true, TABLE_CATEGORIES, columnsCategories, filter, null, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();

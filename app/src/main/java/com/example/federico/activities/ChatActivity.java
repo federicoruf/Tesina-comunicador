@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,8 +36,8 @@ public class ChatActivity extends Activity {
     private TextToSpeech textToSpeech;
     private ImageButton setImgButtonSpeech;
     private Button buttonChoosePhrase;
-    private Button buttonSpeak;
-    private ImageButton imageButton;
+    private ImageButton buttonSpeak;
+    private Button buttonSavePhase;
     private EditText editPhrase;
     private ListView messagesContainer;
 
@@ -72,12 +73,11 @@ public class ChatActivity extends Activity {
         //listView
         this.messagesContainer = (ListView) findViewById(R.id.messagesContainer);
 
-        //input que contiene el mensaje a enviar
-        this.editPhrase = (EditText) findViewById(R.id.speakPhrase);
-
+        //configura el campo de texto donde se ingresa la frase
+        this.setEditPhrase();
 
         //botón para agregar frase a la categoría actualmente seleccionada
-        this.setImageButton();
+        this.setButtonSavePhase();
 
         //botón para el micrófono
         this.setImgButtonSpeech();
@@ -95,6 +95,22 @@ public class ChatActivity extends Activity {
                 ab.setSubtitle(getResources().getString(R.string.chat_title) + " " + this.categorySpanish);
             }
         }
+    }
+
+    private void setEditPhrase() {
+        //input que contiene el mensaje a enviar
+        this.editPhrase = (EditText) findViewById(R.id.speakPhrase);
+        this.editPhrase.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if(keyCode == KeyEvent.KEYCODE_ENTER){
+                        speakPhrase();
+                    }
+
+                }
+                return false;
+            }
+        });
     }
 
     private void setImgButtonSpeech() {
@@ -135,9 +151,9 @@ public class ChatActivity extends Activity {
         }
     }
 
-    private void setImageButton() {
-        this.imageButton = (ImageButton) findViewById(R.id.imageButtonPlus);
-        this.imageButton.setOnClickListener(new View.OnClickListener() {
+    private void setButtonSavePhase() {
+        this.buttonSavePhase = (Button) findViewById(R.id.buttonSavePhase);
+        this.buttonSavePhase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //agrega la frase a la BD tomando en cuenta la categoría
@@ -145,13 +161,17 @@ public class ChatActivity extends Activity {
                 try {
                     Category category = dbAdapter.getCategoryFromSpanishName(categorySpanish);
                     Phrase newPhrase = new Phrase(phrase, category.getId());
-                    long newId = dbAdapter.addPhraseToCategory(Phrase.toContentValues(newPhrase));
-                    if (newId != -1) {
-                        showToastMessage(getResources().getString(R.string.new_phrase));
+                    if ("".equals(newPhrase.getTextPhrase())) {
+                        showToastMessage(getResources().getString(R.string.insert_phrase_to_save));
                     } else {
-                        showToastMessage(getResources().getString(R.string.phrase_repeated));
+                        long newId = dbAdapter.addPhraseToCategory(Phrase.toContentValues(newPhrase));
+                        if (newId != -1) {
+                            showToastMessage(getResources().getString(R.string.new_phrase));
+                        } else {
+                            showToastMessage(getResources().getString(R.string.phrase_repeated));
+                        }
+                        newPhrase.setId(newId);
                     }
-                    newPhrase.setId(newId);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -180,12 +200,28 @@ public class ChatActivity extends Activity {
             }
         });
     }
+    private void speakPhrase(){
+        String messageText = editPhrase.getText().toString();
+        if (TextUtils.isEmpty(messageText)) {
+            return;
+        }
+        createChatMessage(true, messageText);
+        editPhrase.setText("");
+        //esta deprecado, pero si agrego un null al final no lo estará, pero esa versión no esta disponible para APIs antiguas
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
 
     private void setButtonSpeak() {
-        this.buttonSpeak = (Button) findViewById(R.id.buttonSpeak);
+        this.buttonSpeak = (ImageButton) findViewById(R.id.buttonSpeak);
         this.buttonSpeak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                speakPhrase();
+                /*
                 String messageText = editPhrase.getText().toString();
                 if (TextUtils.isEmpty(messageText)) {
                     return;
@@ -197,7 +233,7 @@ public class ChatActivity extends Activity {
                     textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null, null);
                 } else {
                     textToSpeech.speak(messageText, TextToSpeech.QUEUE_FLUSH, null);
-                }
+                }*/
             }
         });
     }

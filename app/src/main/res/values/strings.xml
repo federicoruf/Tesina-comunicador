@@ -21,6 +21,7 @@
     <string name="activate_movile_network">Activar red movil</string>
 
     <!--CHAT ACTIVITY-->
+    <string name="insert_phrase_to_save">Por favor ingrese una frase a guardar</string>
     <string name="new_phrase">Se agrego con exito una nueva frase</string>
     <string name="no_voice_recognition">No se encuentra disponible la herramienta voice recognizer</string>
     <string name="phrase_repeated">La frase ya existe</string>
@@ -29,10 +30,10 @@
     <string name="choose_phrase">Elegir frase</string>
     <string name="other_talk">Oyente</string>
     <string name="myself">Yo</string>
-    <string name="input_select_phrase">Ingrese o seleccione su frase</string>
+    <string name="input_select_phrase">Ingrese/seleccione una frase</string>
     <string name="speak_button">Hablar</string>
     <string name="title_activity_chat">Chat</string>
-    <string name="add_phrase">Agregar frase</string>
+    <string name="add_phrase">Guardar frase</string>
 
     <!--LIST PHRASES ACTIVITY-->
     <string name="phrase_updated">Frase actualizada</string>
